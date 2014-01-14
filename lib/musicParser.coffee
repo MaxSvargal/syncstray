@@ -22,12 +22,12 @@ module.exports = (params) ->
   downloadTrack = (data, callback) ->
     filename = "#{data.artist} - #{data.title}.mp3"
     console.log "Start download track".grey, filename.magenta
-    try
+    
     file = fs.createWriteStream "#{params.dlPath}/#{filename}"
     file.on 'error', (e) ->
       console.log "Error write file '#{filename}'. Aborted.".red.bold
 
-    req = http.get data.url, (response) ->
+    http.get data.url, (response) ->
       response.pipe file
 
       response.on 'error', ->
@@ -45,15 +45,27 @@ module.exports = (params) ->
   return {
     downloadCollection: ->
       getCachedCollection ->
-        throw new Error 'Server return error' if not musicJson
         if musicJson.length isnt 0
           collectionPosition = 0
           loopFn = ->
             track = musicJson[collectionPosition++]
-            track.artist = track.artist.replace '/', ''
-            track.title = track.title.replace '/', ''
-            track.artist = track.artist.replace /\s{2,}/g, ' '
-            track.title = track.title.replace /\s{2,}/g, ' '
+            return if not track
+            # Trim strings for corrective filename
+            try
+              filteredSymbols = [
+                ['/', '']
+                ['[', '']
+                [']', '']
+                [/\s{2,}/g, ' ']
+              ]
+              for symbol in filteredSymbols
+                track.artist = track.artist.replace symbol[0], symbol[1]
+                track.title = track.title.replace symbol[0], symbol[1]
+
+            catch error
+              console.log error.toString().red.bold
+              return
+
             checkOnExists track, (exists) ->
               if exists
                 console.log "#{track.artist} - #{track.title}.mp3" + ' already exists.'.yellow
