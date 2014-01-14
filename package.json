@@ -1,0 +1,5 @@
+{
+  "name": "syncstray",
+  "main": "index.html",
+  "js-flags": "--harmony_proxies --harmony_collections"
+}
