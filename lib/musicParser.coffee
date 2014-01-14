@@ -1,7 +1,6 @@
 http = require 'http'
 https = require 'https'
 fs = require 'fs'
-colors = require 'colors'
 
 module.exports = (params) ->
 
@@ -22,7 +21,7 @@ module.exports = (params) ->
   downloadTrack = (data, callback) ->
     filename = "#{data.artist} - #{data.title}.mp3"
     console.log "Start download track".grey, filename.magenta
-    
+
     file = fs.createWriteStream "#{params.dlPath}/#{filename}"
     file.on 'error', (e) ->
       console.log "Error write file '#{filename}'. Aborted.".red.bold
