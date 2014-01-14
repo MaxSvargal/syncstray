@@ -1,6 +1,6 @@
 require("coffee-script");
-var vksync = require('./lib/main'),
+var gui = require('nw.gui'),
+    syncstray = require('./lib/main'),
     args = process.argv.slice(2);
 
-gui = require('nw.gui');
-vksync.initialize(args, gui);
+syncstray.initialize(args, gui);
