@@ -29,12 +29,9 @@ getPermissions = (params, gui, callback) ->
   childWindow.on 'loaded', ->
     hash = this.window.location.hash
     code = hash.match /#code=(\w+)/, hash
-    if code[1]
+    if code
       this.close()
       callback code[1]
-    else
-      this.reload()
-
 
 module.exports = (params, gui) ->
   initialize: (callback) ->
