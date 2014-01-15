@@ -1,4 +1,5 @@
 https = require 'https'
+gui = global.window.nwDispatcher.requireNwGui()
 
 getToken = (params, callback) ->
   options =
@@ -20,11 +21,9 @@ getToken = (params, callback) ->
       else
         throw json.error
 
-getPermissions = (params, gui, callback) ->
+getPermissions = (params, callback) ->
   url = "https://oauth.vk.com/authorize?client_id=#{params.appID}&scope=audio&response_type=code"
-  childWindow = gui.Window.open url, 
-    width: 607
-    height: 312
+  childWindow = gui.Window.open url
 
   childWindow.on 'loaded', ->
     hash = this.window.location.hash
@@ -33,9 +32,9 @@ getPermissions = (params, gui, callback) ->
       this.close()
       callback code[1]
 
-module.exports = (params, gui) ->
+module.exports = (params) ->
   initialize: (callback) ->
-    getPermissions params, gui, (code) ->
+    getPermissions params, (code) ->
       params.code = code
       getToken params, (token) ->
         callback token

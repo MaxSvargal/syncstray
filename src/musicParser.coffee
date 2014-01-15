@@ -77,11 +77,11 @@ module.exports = (params) ->
         else
           console.log "No tracks in your collection.".red
 
-    getCollectionFromServer: (token, callback) ->
+    getCollectionFromServer: (callback) ->
       options = 
         host: 'api.vk.com'
         port: 443
-        path: "/method/audio.get?access_token=#{token}"
+        path: "/method/audio.get?access_token=#{params.token}"
 
       https.get options, (res) ->
         response = new String
