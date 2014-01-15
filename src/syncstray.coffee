@@ -4,11 +4,16 @@ params =
   dlPath: "#{__dirname}/cache"
   token: null
 
+webI = require './webInterface'
 vkAuth = require('./vkAuth')(params)
-vkAuth.initialize (token) ->
-  params.token = token
-  musicParser = require('./musicParser')(params)
+musicParser = require('./musicParser')(params)
 
-  musicParser.getCollectionFromServer (music) ->
-    #musicParser.downloadCollection()
-    return
+musicParser.getCachedCollection (data) ->
+  if data.code
+    vkAuth.initialize (token) ->
+      params.token = token
+      musicParser.getCollectionFromServer (music) ->
+        webI.showMusicList music
+        return
+  webI.showMusicList data
+

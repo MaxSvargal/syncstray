@@ -10,13 +10,8 @@ module.exports = (params) ->
   writeJsonToFile = (data, callback) ->
     fs.writeFile cacheJsonPath, data, (err) ->
       if err then throw err
-      console.log "Music list cached.".cyan
+      console.log "Music list cached."
       callback()
-
-  getCachedCollection = (callback) ->
-    fs.readFile cacheJsonPath, 'utf8', (err, data) ->
-      musicJson = (JSON.parse data).response
-      callback musicJson
 
   downloadTrack = (data, callback) ->
     filename = "#{data.artist} - #{data.title}.mp3"
@@ -42,8 +37,16 @@ module.exports = (params) ->
       callback exists
 
   return {
+    getCachedCollection: (callback) ->
+      fs.readFile cacheJsonPath, 'utf8', (err, data) ->
+        if err
+          callback err
+          return
+        musicJson = (JSON.parse data).response
+        callback musicJson
+
     downloadCollection: ->
-      getCachedCollection ->
+      @getCachedCollection ->
         if musicJson.length isnt 0
           collectionPosition = 0
           loopFn = ->
@@ -90,5 +93,5 @@ module.exports = (params) ->
         res.on 'end', ->
           musicJson = (JSON.parse response).response
           writeJsonToFile response, ->
-            callback response
+            callback musicJson
   }

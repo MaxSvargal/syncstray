@@ -1,0 +1,22 @@
+#music-list {
+  margin: 0;
+  padding: 0;
+}
+
+.music-list-item {
+  list-style: none;
+  list-style-type: decimal;
+  padding: .5em 1em;
+  background: #eaeaea;
+  margin-bottom: 3px;
+  color: #b9b9b9;
+}
+
+.music-list-item.onprogress {
+  background: #9de2dc;
+  color: #718f8c;
+}
+
+.music-list-item.downloaded {
+  background: #575757;
+}
