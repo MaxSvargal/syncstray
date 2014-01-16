@@ -13,7 +13,7 @@
     "type": "git",
     "url": "https://github.com/MaxSvargal/syncstray.git"
   },
-  "main": "index.html",
+  "main": "./index.html",
   "js-flags": "--harmony_proxies --harmony_collections",
   "single-instance": true,
   "window": {
@@ -27,9 +27,5 @@
     "coffee-script": "~1.6.3",
     "async": "~0.2.9",
     "nedb": "~0.9.4"
-  },
-  "devDependencies": {
-    "grunt": "~0.4.2",
-    "grunt-node-webkit-builder": "~0.1.14"
   }
 }

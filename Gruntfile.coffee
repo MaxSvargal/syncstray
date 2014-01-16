@@ -5,10 +5,16 @@ module.exports = (grunt) ->
         build_dir: './builds'
         version: '0.8.3'
         mac: true,
-        win: true,
-        linux32: true,
-        linux64: true
-      src: ['./**/*']
+        win: false,
+        linux32: false,
+        linux64: false
+      src: [
+        './src/index.html'
+        './src/package.json'
+        './src/assets/*'
+        './src/lib/*'
+        './src/node_modules/**/*'
+      ]
 
   grunt.loadNpmTasks 'grunt-node-webkit-builder'
   grunt.registerTask 'default', ['nodewebkit']

@@ -9,7 +9,8 @@ lib-cov
 .DS_Store
 
 npm-debug.log
-syncstray.app
+src/syncstray.app
 nwsnapshot
 node_modules
+src/node_modules
 builds
