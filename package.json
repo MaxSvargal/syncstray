@@ -2,15 +2,17 @@
   "name": "syncstray",
   "description": "Desktop utility for sync all of your music from vk.com to your computer.",
   "version": "0.1.0",
-  "maintainers":[{
-    "name": "MaxSvargal",
-    "email": "maxsvargal@gmail.com",
-    "web": "http://maxsvargal.com"
-  }],
-  "repositories": [{
-    "type": "git", 
+  "maintainers": [
+    {
+      "name": "MaxSvargal",
+      "email": "maxsvargal@gmail.com",
+      "web": "http://maxsvargal.com"
+    }
+  ],
+  "repository": {
+    "type": "git",
     "url": "https://github.com/MaxSvargal/syncstray.git"
-  }],
+  },
   "main": "index.html",
   "js-flags": "--harmony_proxies --harmony_collections",
   "single-instance": true,
@@ -19,10 +21,15 @@
     "width": 800,
     "height": 600,
     "position": "center",
-    "toolbar": true
+    "toolbar": false
   },
   "dependencies": {
     "coffee-script": "~1.6.3",
-    "nedb": "latest"
+    "async": "~0.2.9",
+    "nedb": "~0.9.4"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.2",
+    "grunt-node-webkit-builder": "~0.1.14"
   }
 }
