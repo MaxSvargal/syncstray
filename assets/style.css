@@ -1,22 +1,52 @@
+body {
+  background: #eaeaea;
+}
+
 #music-list {
   margin: 0;
   padding: 0;
 }
 
 .music-list-item {
+  position: relative;
   list-style: none;
   list-style-type: decimal;
-  padding: .5em 1em;
   background: #eaeaea;
   margin-bottom: 3px;
-  color: #b9b9b9;
+  height: 2em;
+}
+  .music-list-item.onprogress {
+    background: #fff;
+  }
+    .music-list-item.onprogress .music-list-item-label {
+      color: #5a6968;
+    }
+
+  .music-list-item.downloaded {
+    background: #fff;
+  }
+    .music-list-item.downloaded .music-list-item-label {
+      color: #739492;
+    }
+
+  .music-list-item.downloaded .music-list-item-bar {
+    display: none;
+  }
+
+
+.music-list-item-label {
+  color: #8e8e8e;
+  padding: .5em 1em;
+  position: absolute;
+  left: 0;
+  top: 0;
 }
 
-.music-list-item.onprogress {
-  background: #9de2dc;
-  color: #718f8c;
-}
-
-.music-list-item.downloaded {
-  background: #575757;
+.music-list-item-bar {
+  background: #91dcd9;
+  width: 0;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
 }

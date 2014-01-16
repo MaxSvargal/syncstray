@@ -6,34 +6,34 @@ path = require 'path'
 Datastore = require 'nedb'
 db = new Datastore { filename: path.join(gui.App.dataPath, 'collection.db'), autoload: true }
 
-module.exports = (params) ->
+module.exports = (params, webI) ->
 
   musicJson = null
   cacheJsonPath = "#{__dirname}/../cache.json"
 
   saveCollection = (data, callback) ->
-    db.insert data, (err) ->
-      console.log "insert", data
+    db.insert data, (err, collection) ->
       if err then throw err
       console.log "Music list cached."
-      callback()
+      callback collection
 
   downloadTrack = (data, callback) ->
     filename = "#{data.artist} - #{data.title}.mp3"
     console.log "Start download track", filename
 
     file = fs.createWriteStream "#{params.dlPath}/#{filename}", { flags: 'a' }
-    console.log file
+
     file.on 'error', (e) ->
       console.log "Error write file '#{filename}'. Aborted."
 
     http.get data.url, (res) ->
       fsize = res.headers['content-length']
-      console.log "size", fsize
-      
+      len = 0
       res.on 'data', (chunk) ->
         file.write chunk, encoding='binary'
-        console.log 100 - (((fsize - file.bytesWritten) / fsize) * 100)
+        len += chunk.length
+        percent = Math.round len / fsize * 100
+        webI.setProgressBar data.aid, percent
 
       res.on 'error', ->
         console.log "Error with file '#{filename}'. Aborted."
@@ -54,9 +54,7 @@ module.exports = (params) ->
         callback collection
 
     downloadCollection: ->
-      console.log 'start dl'
       @getCachedCollection (collection) ->
-        console.log collection.length
         if collection.length isnt 0
           pos = 0
           loopFn = ->
@@ -77,18 +75,17 @@ module.exports = (params) ->
             catch error
               console.log error.toString()
               return
-
             checkOnExists track, (exists) ->
               if exists
                 console.log "#{track.artist} - #{track.title}.mp3" + ' already exists.'
+                webI.setStatus 'downloaded', track.aid
                 loopFn()
               else
+                webI.setStatus 'onprogress', track.aid
                 downloadTrack track, -> loopFn()
 
           for [0..params.dlThreads-1]
-            console.log '...'
-          #loopFn()
-          console.log params.dlThreads
+            loopFn()
         else
           console.log "No tracks in your collection."
 
@@ -104,6 +101,6 @@ module.exports = (params) ->
         res.on 'data', (chunk) -> response += chunk
         res.on 'end', ->
           musicJson = (JSON.parse response).response
-          saveCollection musicJson, ->
-            callback musicJson
+          saveCollection musicJson, (collection) ->
+            callback collection
   }

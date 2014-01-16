@@ -4,6 +4,7 @@ gui = global.window.nwDispatcher.requireNwGui()
 path = require 'path'
 Datastore = require 'nedb'
 db = new Datastore { filename: path.join(gui.App.dataPath, 'data.db'), autoload: true }
+#/Users/user/Library/Application Support/syncstray/data.db
 
 setTokenData = (data, callback) ->
   db.insert data, (err, doc) ->
