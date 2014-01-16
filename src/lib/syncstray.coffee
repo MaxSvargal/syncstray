@@ -5,19 +5,22 @@ params =
   dlThreads: 4
   token: null
 
+gui = global.window.nwDispatcher.requireNwGui()
 webI = require './webInterface'
 auth = require('./authentication')(params)
 collection = require('./collection')(params, webI)
 
 debugInit = ->
-  gui = global.window.nwDispatcher.requireNwGui()
   gui.Window.get().showDevTools()
   fs = require 'fs'
   fs.watch './lib', [], ->
     global.window.location.reload true
 debugInit()
 
+#gui.Window.get().menu = new gui.Menu { type: 'menubar' }
+
 initialize = ->
+  webI.registerDomEvents collection
   collection.getCachedCollection (data) ->
     if data.length is 0
       auth.initialize (token) ->

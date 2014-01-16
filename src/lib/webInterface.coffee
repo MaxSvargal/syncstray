@@ -46,3 +46,11 @@ module.exports =
       chooser.addEventListener 'change', ->
         callback this.value
       chooser.click()
+
+  registerDomEvents: (collection) ->
+    document.addEventListener 'DOMContentLoaded', ->
+      syncBtn = document.getElementById 'do-sync'
+      syncBtn.addEventListener 'click', (ev) ->
+        ev.preventDefault()
+        collection.stopDownload()
+        syncBtn.className = 'stopped'

@@ -26,7 +26,7 @@ h1 > span {
   font-weight: bold;
 }
 
-.btn-sync {
+#do-sync {
   color: #42b29e;
   background: #fff;
   text-decoration: none;
@@ -36,7 +36,7 @@ h1 > span {
   border-bottom: 2px solid #278877;
 }
 
-.btn-sync:hover {
+#do-sync:hover {
   background: #dfff49;
 }
 

@@ -6,6 +6,7 @@ path = require 'path'
 Datastore = require 'nedb'
 db = new Datastore { filename: path.join(gui.App.dataPath, 'collection.db'), autoload: true }
 #/Users/user/Library/Application Support/syncstray/collection.db
+stopFlag = false
 
 module.exports = (params, webI) ->
 
@@ -39,7 +40,7 @@ module.exports = (params, webI) ->
       res.on 'end', ->
         file.end()
         console.log filename, " downloaded."
-        callback()
+        callback() if stopFlag is false
 
   checkOnExists = (data, callback) ->
     filename = "#{data.artist} - #{data.title}.mp3"
@@ -106,4 +107,7 @@ module.exports = (params, webI) ->
           saveCollection musicJson, ->
             getCachedCollection (collection) ->
               callback collection
+
+    stopDownload: ->
+      stopFlag = true
   }
