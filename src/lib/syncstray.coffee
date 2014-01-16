@@ -9,6 +9,14 @@ webI = require './webInterface'
 auth = require('./authentication')(params)
 collection = require('./collection')(params, webI)
 
+debugInit = ->
+  gui = global.window.nwDispatcher.requireNwGui()
+  gui.Window.get().showDevTools()
+  fs = require 'fs'
+  fs.watch './lib', [], ->
+    global.window.location.reload true
+debugInit()
+
 initialize = ->
   collection.getCachedCollection (data) ->
     if data.length is 0
