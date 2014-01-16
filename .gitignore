@@ -10,6 +10,7 @@ lib-cov
 
 npm-debug.log
 src/syncstray.app
+src/test.html
 nwsnapshot
 node_modules
 src/node_modules

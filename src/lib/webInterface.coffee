@@ -1,10 +1,10 @@
 document = window.document
 
 module.exports =
-  showMusicList: (musicListData) ->
+  showMusicList: (collection) ->
     ul = document.getElementById 'music-list'
     frag = document.createDocumentFragment()
-    for track in musicListData
+    for track in collection
       li = document.createElement 'li'
       li.className = 'music-list-item'
       li.id = "music-list-item_#{track.aid}"
