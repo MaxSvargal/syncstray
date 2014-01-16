@@ -35,10 +35,13 @@ h1 > span {
   line-height: 2em;
   border-bottom: 2px solid #278877;
 }
+  #do-sync:hover {
+    background: #dfff49;
+  }
 
-#do-sync:hover {
-  background: #dfff49;
-}
+  #do-sync.stopped {
+    background: #2c7f71
+  }
 
 #music-list {
   margin: 0;
