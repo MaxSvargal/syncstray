@@ -11,7 +11,6 @@ setTokenData = (data, callback) ->
 
 getToken = (callback) ->
   db.find {}, (err, docs) ->
-    console.log docs
     callback docs[docs.length-1].auth_code
 
 getTokenFromServer = (params, callback) ->
@@ -28,7 +27,6 @@ getTokenFromServer = (params, callback) ->
     res.on 'data', (chunk) -> response += chunk
     res.on 'end', ->
       json = JSON.parse response
-      console.log 'token', json
       if json.access_token
         console.log "Auth successed!"
         callback json.access_token
@@ -60,5 +58,5 @@ module.exports = (params) ->
           callback null, token
     ], (err, token) ->
       console.log err if err
-      console.log "Get download with token ", token
+      console.log "Get ready with token ", token
       callback token if typeof token is 'string'

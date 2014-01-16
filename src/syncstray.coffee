@@ -1,19 +1,22 @@
 params =
   appID: '4027411'
   appSecret: 'MDn6yOgRLmkWBbm1PTFL'
-  dlPath: "#{__dirname}/cache"
+  dlPath: "#{__dirname}/../cache"
+  dlThreads: 4
   token: null
 
 webI = require './webInterface'
-vkAuth = require('./vkAuth')(params)
-musicParser = require('./musicParser')(params)
+auth = require('./authentication')(params)
+collection = require('./collection')(params)
 
-musicParser.getCachedCollection (data) ->
-  if data.code
-    vkAuth.initialize (token) ->
+collection.getCachedCollection (data) ->
+  if data.length is 0
+    auth.initialize (token) ->
       params.token = token
-      musicParser.getCollectionFromServer (music) ->
+      collection.getCollectionFromServer (music) ->
         webI.showMusicList music
+        collection.downloadCollection music
         return
-  webI.showMusicList data
-
+  else
+    webI.showMusicList data
+    collection.downloadCollection data

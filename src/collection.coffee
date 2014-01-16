@@ -1,34 +1,46 @@
 http = require 'http'
 https = require 'https'
 fs = require 'fs'
+gui = global.window.nwDispatcher.requireNwGui()
+path = require 'path'
+Datastore = require 'nedb'
+db = new Datastore { filename: path.join(gui.App.dataPath, 'collection.db'), autoload: true }
 
 module.exports = (params) ->
 
   musicJson = null
   cacheJsonPath = "#{__dirname}/../cache.json"
 
-  writeJsonToFile = (data, callback) ->
-    fs.writeFile cacheJsonPath, data, (err) ->
+  saveCollection = (data, callback) ->
+    db.insert data, (err) ->
+      console.log "insert", data
       if err then throw err
       console.log "Music list cached."
       callback()
 
   downloadTrack = (data, callback) ->
     filename = "#{data.artist} - #{data.title}.mp3"
-    console.log "Start download track".grey, filename.magenta
+    console.log "Start download track", filename
 
-    file = fs.createWriteStream "#{params.dlPath}/#{filename}"
+    file = fs.createWriteStream "#{params.dlPath}/#{filename}", { flags: 'a' }
+    console.log file
     file.on 'error', (e) ->
-      console.log "Error write file '#{filename}'. Aborted.".red.bold
+      console.log "Error write file '#{filename}'. Aborted."
 
-    http.get data.url, (response) ->
-      response.pipe file
+    http.get data.url, (res) ->
+      fsize = res.headers['content-length']
+      console.log "size", fsize
+      
+      res.on 'data', (chunk) ->
+        file.write chunk, encoding='binary'
+        console.log 100 - (((fsize - file.bytesWritten) / fsize) * 100)
 
-      response.on 'error', ->
-        console.log "Error with file '#{filename}'. Aborted.".red.bold
+      res.on 'error', ->
+        console.log "Error with file '#{filename}'. Aborted."
 
-      response.on 'end', ->
-        console.log filename.bold, " downloaded.".green
+      res.on 'end', ->
+        file.end()
+        console.log filename, " downloaded."
         callback()
 
   checkOnExists = (data, callback) ->
@@ -38,20 +50,18 @@ module.exports = (params) ->
 
   return {
     getCachedCollection: (callback) ->
-      fs.readFile cacheJsonPath, 'utf8', (err, data) ->
-        if err
-          callback err
-          return
-        musicJson = (JSON.parse data).response
-        callback musicJson
+      db.find {}, (err, collection) ->
+        callback collection
 
     downloadCollection: ->
-      @getCachedCollection ->
-        if musicJson.length isnt 0
-          collectionPosition = 0
+      console.log 'start dl'
+      @getCachedCollection (collection) ->
+        console.log collection.length
+        if collection.length isnt 0
+          pos = 0
           loopFn = ->
-            track = musicJson[collectionPosition++]
-            return if not track
+            track = collection[pos++]
+            #return if not track
             # Trim strings for corrective filename
             try
               filteredSymbols = [
@@ -65,20 +75,22 @@ module.exports = (params) ->
                 track.title = track.title.replace symbol[0], symbol[1]
 
             catch error
-              console.log error.toString().red.bold
+              console.log error.toString()
               return
 
             checkOnExists track, (exists) ->
               if exists
-                console.log "#{track.artist} - #{track.title}.mp3" + ' already exists.'.yellow
+                console.log "#{track.artist} - #{track.title}.mp3" + ' already exists.'
                 loopFn()
               else
                 downloadTrack track, -> loopFn()
 
           for [0..params.dlThreads-1]
-            loopFn()
+            console.log '...'
+          #loopFn()
+          console.log params.dlThreads
         else
-          console.log "No tracks in your collection.".red
+          console.log "No tracks in your collection."
 
     getCollectionFromServer: (callback) ->
       options = 
@@ -92,6 +104,6 @@ module.exports = (params) ->
         res.on 'data', (chunk) -> response += chunk
         res.on 'end', ->
           musicJson = (JSON.parse response).response
-          writeJsonToFile response, ->
+          saveCollection musicJson, ->
             callback musicJson
   }
