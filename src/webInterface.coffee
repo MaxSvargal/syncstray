@@ -28,9 +28,13 @@ module.exports =
     if not el then throw new Error "No element with id #{id}"
     el.style.width = percent + '%'
     if percent is 100 then @setStatus 'downloaded', id 
-
+    if percent is 0 then @scrollTo el.parentNode.nextSibling
 
   setStatus: (status, id) ->
     elClass = 'music-list-item'
     el = document.getElementById "#{elClass}_#{id}"
     el.className = elClass + ' ' + status
+
+  scrollTo: (el) ->
+    offset = el.offsetTop - window.innerHeight
+    document.body.scrollTop = offset

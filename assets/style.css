@@ -1,10 +1,48 @@
 body {
   background: #eaeaea;
+  margin: 0;
+  font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", 
+    Helvetica, Arial, "Lucida Grande", sans-serif;
+}
+
+header {
+  background: #42b29e;
+  overflow: hidden;
+  padding: 1em;
+  position: fixed;
+  z-index: 10;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+h1 {
+  color: #fff;
+  font-weight: normal;
+  float: right;
+  margin: 0;
+}
+
+h1 > span {
+  font-weight: bold;
+}
+
+.btn-sync {
+  color: #42b29e;
+  background: #fff;
+  text-decoration: none;
+  padding: .3em 1em;
+  font-size: 1.2em;
+  line-height: 2em;
+  border-bottom: 2px solid #278877;
+}
+
+.btn-sync:hover {
+  background: #dfff49;
 }
 
 #music-list {
   margin: 0;
-  padding: 0;
+  padding: 71px 0 0 0;
 }
 
 .music-list-item {

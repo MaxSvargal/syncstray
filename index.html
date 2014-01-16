@@ -5,13 +5,16 @@
     <title>SyncStray</title>
     <link rel="stylesheet" href="assets/style.css">
     <script>
-      //require('nw.gui').Window.get().showDevTools();
+      require('nw.gui').Window.get().showDevTools();
       require('coffee-script');
       require('./src/syncstray.coffee');
     </script>
   </head>
   <body>
-    <h1>SyncStray</h1>
+    <header id="header">
+      <a href="#" id="do-sync" class="btn-sync">sync</a>
+      <h1>Sync<span>Stray</span></h1>
+    </header>
     <ul id="music-list"></ul>
   </body>
 </html>
