@@ -3,16 +3,6 @@ async = require 'async'
 gui = global.window.nwDispatcher.requireNwGui()
 path = require 'path'
 Datastore = require 'nedb'
-db = new Datastore { filename: path.join(gui.App.dataPath, 'data.db'), autoload: true }
-#/Users/user/Library/Application Support/syncstray/data.db
-
-setTokenData = (data, callback) ->
-  db.insert data, (err, doc) ->
-    callback doc
-
-getToken = (callback) ->
-  db.find {}, (err, docs) ->
-    callback docs[docs.length-1].auth_code
 
 getTokenFromServer = (params, callback) ->
   options =
@@ -37,6 +27,7 @@ getTokenFromServer = (params, callback) ->
 getPermissions = (params, callback) ->
   url = "https://oauth.vk.com/authorize?client_id=#{params.appID}&scope=audio&response_type=code"
   childWindow = gui.Window.open url
+  childWindow.hide()
 
   childWindow.on 'loaded', ->
     hash = this.window.location.hash
@@ -44,6 +35,8 @@ getPermissions = (params, callback) ->
     if code
       this.close()
       callback code[1]
+    else
+      this.show()
 
 module.exports = (params) ->
   initialize: (callback) ->

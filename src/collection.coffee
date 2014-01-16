@@ -5,6 +5,7 @@ gui = global.window.nwDispatcher.requireNwGui()
 path = require 'path'
 Datastore = require 'nedb'
 db = new Datastore { filename: path.join(gui.App.dataPath, 'collection.db'), autoload: true }
+#/Users/user/Library/Application Support/syncstray/collection.db
 
 module.exports = (params, webI) ->
 
