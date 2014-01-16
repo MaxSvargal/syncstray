@@ -12,10 +12,10 @@ module.exports = (params, webI) ->
   cacheJsonPath = "#{__dirname}/../cache.json"
 
   saveCollection = (data, callback) ->
-    db.insert data, (err, collection) ->
+    db.insert data, (err) ->
       if err then throw err
       console.log "Music list cached."
-      callback collection
+      callback()
 
   downloadTrack = (data, callback) ->
     filename = "#{data.artist} - #{data.title}.mp3"
@@ -90,6 +90,7 @@ module.exports = (params, webI) ->
           console.log "No tracks in your collection."
 
     getCollectionFromServer: (callback) ->
+      getCachedCollection = @getCachedCollection
       options = 
         host: 'api.vk.com'
         port: 443
@@ -101,6 +102,7 @@ module.exports = (params, webI) ->
         res.on 'data', (chunk) -> response += chunk
         res.on 'end', ->
           musicJson = (JSON.parse response).response
-          saveCollection musicJson, (collection) ->
-            callback collection
+          saveCollection musicJson, ->
+            getCachedCollection (collection) ->
+              callback collection
   }
