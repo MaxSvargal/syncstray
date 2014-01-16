@@ -88,3 +88,7 @@ h1 > span {
   left: 0;
   top: 0;
 }
+
+#choose-folder {
+  display: none;
+}

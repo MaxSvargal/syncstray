@@ -9,9 +9,6 @@ db = new Datastore { filename: path.join(gui.App.dataPath, 'collection.db'), aut
 
 module.exports = (params, webI) ->
 
-  musicJson = null
-  cacheJsonPath = "#{__dirname}/../cache.json"
-
   saveCollection = (data, callback) ->
     db.insert data, (err) ->
       if err then throw err
@@ -55,6 +52,9 @@ module.exports = (params, webI) ->
         callback collection
 
     downloadCollection: ->
+      fs.exists params.dlPath, (exists) ->
+        fs.mkdirSync params.dlPath if not exists
+
       @getCachedCollection (collection) ->
         if collection.length isnt 0
           pos = 0

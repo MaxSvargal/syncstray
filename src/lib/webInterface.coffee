@@ -38,3 +38,11 @@ module.exports =
   scrollTo: (el) ->
     offset = el.offsetTop - window.innerHeight
     document.body.scrollTop = offset
+
+  chooseFolderDialog: (callback) ->
+    global.window.alert 'Please, select folder for upload.'
+    document.addEventListener 'DOMContentLoaded', ->
+      chooser = document.getElementById 'choose-folder'
+      chooser.addEventListener 'change', ->
+        callback this.value
+      chooser.click()
