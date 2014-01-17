@@ -10,14 +10,6 @@ webI = require './webInterface'
 auth = require('./authentication')(params)
 collection = require('./collection')(params, webI)
 
-debugInit = ->
-  gui.Window.get().showDevTools()
-  fs = require 'fs'
-  fs.watch './lib', [], ->
-    global.window.location.reload true
-#debugInit()
-#gui.Window.get().menu = new gui.Menu { type: 'menubar' }
-
 initialize = ->
   webI.registerDomEvents collection
   collection.getCachedCollection (data) ->
