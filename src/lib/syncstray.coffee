@@ -15,8 +15,7 @@ debugInit = ->
   fs = require 'fs'
   fs.watch './lib', [], ->
     global.window.location.reload true
-debugInit()
-
+#debugInit()
 #gui.Window.get().menu = new gui.Menu { type: 'menubar' }
 
 initialize = ->
