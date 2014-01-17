@@ -96,7 +96,7 @@ module.exports = (params, webI) ->
           for [0..numForLoop]
             loopDlFn()
         else
-          console.log "No tracks in your collection."
+          webI.showNoTracks()
 
     getCollectionFromServer: (callback) ->
       getCachedCollection = @getCachedCollection
@@ -121,7 +121,6 @@ module.exports = (params, webI) ->
       else
         stopFlag = false
         numForLoop = params.dlThreads - onProcess - 1
-        console.log "NUMBER OF STARTED DL", numForLoop
         for [0..numForLoop]
           loopDlFn()
   }

@@ -39,6 +39,13 @@ module.exports =
     offset = el.offsetTop - window.innerHeight
     document.body.scrollTop = offset
 
+  showNoTracks: ->
+    ul = document.getElementById 'music-list'
+    el = document.createElement 'div'
+    el.className = 'message-notracks'
+    el.innerHTML = 'No tracks in your playlist :('
+    ul.appendChild el
+
   chooseFolderDialog: (callback) ->
     global.window.alert 'Please, select folder for upload.'
     document.addEventListener 'DOMContentLoaded', ->
