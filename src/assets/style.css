@@ -1,6 +1,7 @@
 body {
   background: #eaeaea;
   margin: 0;
+  -webkit-font-smoothing: antialiased;
   font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", 
     Helvetica, Arial, "Lucida Grande", sans-serif;
 }
@@ -55,13 +56,21 @@ h1 > span {
     background: #2c7f71
   }
 
+  #do-sync.rotate:before {
+    -webkit-animation: spin 4s linear infinite;
+  }
+
+  @-webkit-keyframes spin {
+    100% { -webkit-transform: rotate(-360deg); }
+  }
+
 #do-options {
   display: inline-block;
   background: url('icon_options.png') no-repeat;
   width: 24px;
   height: 24px;
   position: absolute;
-  top: 1.6em;
+  top: 1.7em;
   left: 8.2em;
 }
 
@@ -196,3 +205,22 @@ h1 > span {
     font-size: .9em;
     text-align: center;
   }
+
+#counter {
+  position: absolute;
+  top: .5em;
+  right: 180px;
+}
+
+#counter-label {
+  position: absolute;
+  top: .5em;
+  right: 180px;
+  color: #fff;
+  font-weight: bold;
+  width: 60px;
+  height: 60px;
+  line-height: 4.9em;
+  text-align: center;
+  font-size: .8em;
+}

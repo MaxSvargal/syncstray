@@ -4,15 +4,13 @@
     <meta charset="utf-8">
     <title>SyncStray</title>
     <link rel="stylesheet" href="assets/style.css">
-    <script>
-      require('coffee-script');
-      require('./lib/syncstray.coffee');
-    </script>
   </head>
   <body>
     <header id="header">
-      <a href="#" id="do-sync">sync</a>
+      <a href="#" id="do-sync" class="rotate">sync</a>
       <a href="#" id="do-options"></a>
+      <canvas id="counter" width="60" height="60"></canvas>
+      <div id="counter-label">100%</div>
       <h1>Sync<span>Stray</span></h1>
     </header>
     <div id="options" class="hidden">
@@ -38,5 +36,9 @@
       <ul id="music-list"></ul>
     </div>
     <input type="file" id="choose-folder" nwdirectory />
+    <script>
+      require('coffee-script');
+      require('./lib/syncstray.coffee');
+    </script>
   </body>
 </html>

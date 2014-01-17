@@ -13,6 +13,8 @@ collectionBase = []
 
 module.exports = (params, webI) ->
 
+  counter = webI.circleCounter()
+
   saveCollection = (data, callback) ->
     db.insert data, (err) ->
       if err then throw err
@@ -22,7 +24,6 @@ module.exports = (params, webI) ->
   downloadTrack = (data, callback) ->
     filename = "#{data.artist} - #{data.title}.mp3"
     #console.log "Start download track", filename
-
     file = fs.createWriteStream "#{params.dlPath}/#{filename}", { flags: 'a' }
 
     file.on 'error', (e) ->
@@ -55,11 +56,12 @@ module.exports = (params, webI) ->
 
   loopDlFn = ->
     track = collectionBase[collCurrPos++]
+    counter.draw (collectionBase.length / collCurrPos).toFixed(1)
     return if not track
     # Trim strings for corrective filename
     try
       filteredSymbols = [
-        ['/', '']
+        ['/\//g', '']
         ['[', '']
         [']', '']
         [/\s{2,}/g, ' ']
