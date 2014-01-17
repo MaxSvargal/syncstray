@@ -3,7 +3,7 @@ module.exports = (grunt) ->
     nodewebkit:
       options:
         build_dir: './builds'
-        version: '0.8.3'
+        version: '0.8.4'
         mac: true
         win: true
         linux32: false
