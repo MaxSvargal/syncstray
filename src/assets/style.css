@@ -7,7 +7,6 @@ body {
 
 header {
   background: #42b29e;
-  overflow: hidden;
   padding: 1em;
   position: fixed;
   z-index: 10;
@@ -73,7 +72,6 @@ h1 > span {
 #music-list {
   margin: 0;
   padding: 0;
-  overflow-y: scroll;
 }
 
 .music-list-item {
