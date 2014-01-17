@@ -1,0 +1,11 @@
+{
+  "name": "syncstray-builder",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MaxSvargal/syncstray.git"
+  },
+  "dependencies": {
+    "grunt": "~0.4.2",
+    "grunt-node-webkit-builder": "~0.1.14"
+  }
+}

@@ -52,5 +52,20 @@ module.exports =
       syncBtn = document.getElementById 'do-sync'
       syncBtn.addEventListener 'click', (ev) ->
         ev.preventDefault()
-        collection.stopDownload()
-        syncBtn.className = 'stopped'
+        collection.toggleDownload()
+        if syncBtn.classList.contains 'stopped'
+          syncBtn.className = ''
+        else
+          syncBtn.className = 'stopped'
+
+      optionsOverlay = document.getElementById 'options'
+
+      optionsBtn = document.getElementById 'do-options'
+      optionsBtn.addEventListener 'click', (ev) ->
+        ev.preventDefault()
+        optionsOverlay.className = ''
+
+      closeConfigBtn = document.getElementById 'do-options-close'
+      closeConfigBtn.addEventListener 'click' , (ev) ->
+        ev.preventDefault()
+        optionsOverlay.className += ' hidden'

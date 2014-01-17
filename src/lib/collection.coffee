@@ -7,6 +7,9 @@ Datastore = require 'nedb'
 db = new Datastore { filename: path.join(gui.App.dataPath, 'collection.db'), autoload: true }
 #/Users/user/Library/Application Support/syncstray/collection.db
 stopFlag = false
+onProcess = 0
+collCurrPos = 0
+collectionBase = []
 
 module.exports = (params, webI) ->
 
@@ -18,7 +21,7 @@ module.exports = (params, webI) ->
 
   downloadTrack = (data, callback) ->
     filename = "#{data.artist} - #{data.title}.mp3"
-    console.log "Start download track", filename
+    #console.log "Start download track", filename
 
     file = fs.createWriteStream "#{params.dlPath}/#{filename}", { flags: 'a' }
 
@@ -28,24 +31,54 @@ module.exports = (params, webI) ->
     http.get data.url, (res) ->
       fsize = res.headers['content-length']
       len = 0
+      onProcess++
       res.on 'data', (chunk) ->
-        file.write chunk, encoding='binary'
+        file.write chunk
         len += chunk.length
         percent = Math.round len / fsize * 100
         webI.setProgressBar data.aid, percent
 
       res.on 'error', ->
+        onProcess--
         console.log "Error with file '#{filename}'. Aborted."
 
       res.on 'end', ->
         file.end()
-        console.log filename, " downloaded."
+        onProcess--
+        #console.log filename, " downloaded."
         callback() if stopFlag is false
 
   checkOnExists = (data, callback) ->
     filename = "#{data.artist} - #{data.title}.mp3"
     fs.exists "#{params.dlPath}/#{filename}", (exists) ->
       callback exists
+
+  loopDlFn = ->
+    track = collectionBase[collCurrPos++]
+    return if not track
+    # Trim strings for corrective filename
+    try
+      filteredSymbols = [
+        ['/', '']
+        ['[', '']
+        [']', '']
+        [/\s{2,}/g, ' ']
+      ]
+      for symbol in filteredSymbols
+        track.artist = track.artist.replace symbol[0], symbol[1]
+        track.title = track.title.replace symbol[0], symbol[1]
+
+    catch error
+      console.log error.toString()
+      return
+    checkOnExists track, (exists) ->
+      if exists
+        #console.log "#{track.artist} - #{track.title}.mp3" + ' already exists.'
+        webI.setStatus 'downloaded', track.aid
+        loopDlFn()
+      else
+        webI.setStatus 'onprogress', track.aid
+        downloadTrack track, -> loopDlFn()
 
   return {
     getCachedCollection: (callback) ->
@@ -58,36 +91,10 @@ module.exports = (params, webI) ->
 
       @getCachedCollection (collection) ->
         if collection.length isnt 0
-          pos = 0
-          loopFn = ->
-            track = collection[pos++]
-            #return if not track
-            # Trim strings for corrective filename
-            try
-              filteredSymbols = [
-                ['/', '']
-                ['[', '']
-                [']', '']
-                [/\s{2,}/g, ' ']
-              ]
-              for symbol in filteredSymbols
-                track.artist = track.artist.replace symbol[0], symbol[1]
-                track.title = track.title.replace symbol[0], symbol[1]
-
-            catch error
-              console.log error.toString()
-              return
-            checkOnExists track, (exists) ->
-              if exists
-                console.log "#{track.artist} - #{track.title}.mp3" + ' already exists.'
-                webI.setStatus 'downloaded', track.aid
-                loopFn()
-              else
-                webI.setStatus 'onprogress', track.aid
-                downloadTrack track, -> loopFn()
-
-          for [0..params.dlThreads-1]
-            loopFn()
+          collectionBase = collection
+          numForLoop = params.dlThreads - onProcess - 1
+          for [0..numForLoop]
+            loopDlFn()
         else
           console.log "No tracks in your collection."
 
@@ -108,6 +115,13 @@ module.exports = (params, webI) ->
             getCachedCollection (collection) ->
               callback collection
 
-    stopDownload: ->
-      stopFlag = true
+    toggleDownload: ->
+      if stopFlag is false
+        stopFlag = true
+      else
+        stopFlag = false
+        numForLoop = params.dlThreads - onProcess - 1
+        console.log "NUMBER OF STARTED DL", numForLoop
+        for [0..numForLoop]
+          loopDlFn()
   }

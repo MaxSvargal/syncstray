@@ -26,26 +26,54 @@ h1 > span {
   font-weight: bold;
 }
 
+.hidden {
+  display: none;
+}
+
 #do-sync {
   color: #42b29e;
   background: #fff;
   text-decoration: none;
-  padding: .3em 1em;
-  font-size: 1.2em;
+  padding: .1em .8em .2em 2em;
+  font-size: 1.4em;
   line-height: 2em;
   border-bottom: 2px solid #278877;
 }
+  #do-sync:before {
+    position: absolute;
+    content: '';
+    background: url('icon_sync.png') no-repeat;
+    width: 24px;
+    height: 24px;
+    left: 1.2em;
+    top: 1.2em;
+  }
   #do-sync:hover {
-    background: #dfff49;
+    background: #FFC95C;
   }
 
   #do-sync.stopped {
     background: #2c7f71
   }
 
+#do-options {
+  display: inline-block;
+  background: url('icon_options.png') no-repeat;
+  width: 24px;
+  height: 24px;
+  position: absolute;
+  top: 1.6em;
+  left: 8.2em;
+}
+
+.wrap {
+  padding-top: 76px;
+}
+
 #music-list {
   margin: 0;
-  padding: 71px 0 0 0;
+  padding: 0;
+  overflow-y: scroll;
 }
 
 .music-list-item {
@@ -92,6 +120,81 @@ h1 > span {
   top: 0;
 }
 
+.music-list-item-bar.smooth {
+  transition: width .3s ease-in-out;
+}
+
 #choose-folder {
   display: none;
 }
+
+
+#options {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(66, 178, 158, .7);
+  z-index: 20;
+  box-sizing: border-box;
+  padding: 5em 2em 2em 2em;
+  color: #fff;
+  font-size: 1.2em;
+}
+  .options-item {
+    margin-bottom: .6em;
+  }
+
+  .options-item-checkbox {
+    color: #fff;
+    text-decoration: none;
+  }
+    .options-item-checkbox-icon {
+      display: inline-block;
+      width: .7em;
+      height: .7em;
+      background: #fff;
+      border: 2px solid #fff;
+    }
+    .options-item-checkbox.checked
+    .options-item-checkbox-icon {
+      background: #FFC95C;
+      border: 2px solid #fff;
+    }
+    .options-item-input-label {
+      display: inline-block;
+    }
+
+  .options-change-dir {
+    display: inline-block;
+    background: #fff;
+    color: #000;
+    padding: .5em 1em;
+    text-decoration: none;
+    text-align: center;
+  }
+  .options-change-dir:hover {
+    background: #FFC95C;
+  }
+  .options-change-dir-current {
+    display: block;
+    font-size: .6em;
+    margin-top: .5em;
+    background: #F8F8F8;
+  }
+
+  .bnt-close-options {
+    background: #FFC95C;
+    padding: .5em 1em;
+    color: #fff;
+    text-decoration: none;
+    border-bottom: 2px solid #000;
+    float: right;
+  }
+
+  .options-item-input {
+    width: 1.5em;
+    font-size: .9em;
+    text-align: center;
+  }

@@ -26,7 +26,12 @@ getTokenFromServer = (params, callback) ->
 
 getPermissions = (params, callback) ->
   url = "https://oauth.vk.com/authorize?client_id=#{params.appID}&scope=audio&response_type=code"
-  childWindow = gui.Window.open url
+  childWindow = gui.Window.open url, {
+    width: 800
+    height: 600
+    position: "center"
+    toolbar: false
+  }
   childWindow.hide()
 
   childWindow.on 'loaded', ->
