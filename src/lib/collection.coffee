@@ -86,9 +86,6 @@ module.exports = (params, webI) ->
         callback collection
 
     downloadCollection: ->
-      fs.exists params.dlPath, (exists) ->
-        fs.mkdirSync params.dlPath if not exists
-
       @getCachedCollection (collection) ->
         if collection.length isnt 0
           collectionBase = collection
