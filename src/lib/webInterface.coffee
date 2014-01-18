@@ -64,7 +64,7 @@ module.exports =
           syncBtn.className = 'rotate'
         else
           syncBtn.className = 'stopped'
-
+            
       optionsOverlay = document.getElementById 'options'
 
       optionsBtn = document.getElementById 'do-options'
@@ -99,17 +99,14 @@ module.exports =
     imd = ctx.getImageData 0, 0, 60, 60
 
     changeText = (percent) ->
-      if percent is 100
-        text.innerHTML = 'done' 
-        setDoneStatus()
-      else 
-        text.innerHTML = (percent).toFixed(1) + '%'
-
+      text.innerHTML = percent + '%'
+      setDoneStatus() if percent is 100
+        
     return {
       draw: (current) ->
         ctx.putImageData imd, 0, 0
         ctx.beginPath()
-        ctx.arc 30, 30, 20, -(quart), ((circ) * current) - quart, false
+        ctx.arc 30, 30, 20, -(quart), ((circ * current) / 100) - quart, false
         ctx.stroke()
-        changeText current * 100
+        changeText current
     }

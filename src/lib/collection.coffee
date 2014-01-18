@@ -56,12 +56,13 @@ module.exports = (params, webI) ->
 
   loopDlFn = ->
     track = collectionBase[collCurrPos++]
-    counter.draw (collectionBase.length / collCurrPos).toFixed(1)
+    currPerc = collCurrPos * 100 / collectionBase.length
+    counter.draw (currPerc).toFixed(1)
     return if not track
     # Trim strings for corrective filename
     try
       filteredSymbols = [
-        ['/\//g', '']
+        [/\//g, '']
         ['[', '']
         [']', '']
         [/\s{2,}/g, ' ']
