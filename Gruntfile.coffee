@@ -6,8 +6,8 @@ module.exports = (grunt) ->
         version: '0.8.4'
         mac: true
         win: true
-        linux32: false
-        linux64: false
+        linux32: true
+        linux64: true
       src: [ './src/**/*' ]
 
   grunt.loadNpmTasks 'grunt-node-webkit-builder'
