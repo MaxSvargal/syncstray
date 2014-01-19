@@ -5,7 +5,9 @@ params =
   dlThreads: 4
   token: null
 
-gui = global.window.nwDispatcher.requireNwGui()
+#gui = global.window.nwDispatcher.requireNwGui()
+#gui.Window.get().showDevTools()
+
 webI = require './webInterface'
 auth = require('./authentication')(params)
 collection = require('./collection')(params, webI)
