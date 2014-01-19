@@ -35,13 +35,13 @@ getPermissions = (params, callback) ->
   childWindow.hide()
 
   childWindow.on 'loaded', ->
-    hash = this.window.location.hash
+    hash = @window.location.hash
     code = hash.match /#code=(\w+)/, hash
     if code
-      this.close()
+      @close()
       callback code[1]
     else
-      this.show()
+      @show()
 
 module.exports = (params) ->
   initialize: (callback) ->
