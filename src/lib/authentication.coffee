@@ -45,17 +45,9 @@ getPermissions = (params, callback) ->
 
 module.exports = (params) ->
   initialize: (callback) ->
-    async.waterfall [
-      (callback) ->
-        getPermissions params, (code) ->
-          #saveAuthCode code, ->
-          callback null, code
-      (code, callback) ->
-        params.code = code
-        getTokenFromServer params, (token) ->
-          callback "Getting token fail." if token.type is 'error'
-          callback null, token
-    ], (err, token) ->
-      console.log err if err
-      console.log "Get ready with token ", token
-      callback token if typeof token is 'string'
+    getPermissions params, (code) ->
+      params.code = code
+      getTokenFromServer params, (token) ->
+        callback "Getting token fail." if token.type is 'error'
+        console.log "Get ready with token ", token
+        callback token if typeof token is 'string'

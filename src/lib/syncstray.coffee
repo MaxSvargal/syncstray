@@ -10,7 +10,7 @@ webI = require './webInterface'
 auth = require('./authentication')(params)
 collection = require('./collection')(params, webI)
 
-initialize = (offline = false) ->
+initialize = ->
   webI.registerDomEvents collection
   collection.getCachedCollection (data) ->
     if data.length is 0
@@ -22,14 +22,13 @@ initialize = (offline = false) ->
           return
     else
       webI.showMusicList data
-      collection.downloadCollection data if offline is false
+      collection.downloadCollection data
       return
 
-require('dns').resolve 'vk.com', (err) ->
-  if not params.dlPath
-    webI.chooseFolderDialog (folder) ->
-      params.dlPath = folder
-      global.window.localStorage.setItem 'dlPath', folder
-      if not err then initialize() else initialize true
-  else
-    if not err then initialize() else initialize true
+if not params.dlPath
+  webI.chooseFolderDialog (folder) ->
+    params.dlPath = folder
+    global.window.localStorage.setItem 'dlPath', folder
+    initialize()
+else
+  initialize()

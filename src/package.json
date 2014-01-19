@@ -25,7 +25,6 @@
   },
   "dependencies": {
     "coffee-script": "~1.6.3",
-    "async": "~0.2.9",
     "nedb": "~0.9.4"
   }
 }
