@@ -34,3 +34,10 @@ if not params.dlPath
     initialize()
 else
   initialize()
+
+win = gui.Window.get()
+win.on 'close', ->
+  @hide()
+  collection.stopCurrDownloads ->
+    win.close true
+    gui.App.quit()

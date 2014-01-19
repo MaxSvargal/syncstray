@@ -21,8 +21,11 @@ module.exports = (params, webI) ->
       console.log "Music list cached."
       callback()
 
+  getFileName = (data) ->
+    "#{data.artist} - #{data.title}.mp3"
+
   downloadTrack = (data, callback) ->
-    filename = "#{data.artist} - #{data.title}.mp3"
+    filename = getFileName data
     #console.log "Start download track", filename
     file = fs.createWriteStream "#{params.dlPath}/#{filename}", { flags: 'a' }
 
@@ -50,7 +53,7 @@ module.exports = (params, webI) ->
         callback() if stopFlag is false
 
   checkOnExists = (data, callback) ->
-    filename = "#{data.artist} - #{data.title}.mp3"
+    filename = getFileName data
     fs.exists "#{params.dlPath}/#{filename}", (exists) ->
       callback exists
 
@@ -123,4 +126,15 @@ module.exports = (params, webI) ->
         numForLoop = params.dlThreads - onProcess - 1
         for [0..numForLoop]
           loopDlFn()
+
+    stopCurrDownloads: (callback) ->
+      @toggleDownload()
+      currPos = new Number collCurrPos
+      for [0..params.dlThreads-1]
+        filename = getFileName collectionBase[--currPos]
+        try
+          fs.unlinkSync "#{params.dlPath}/#{filename}"
+        catch err
+          "Error of remove file #{filename}: #{err}"
+      callback()
   }
