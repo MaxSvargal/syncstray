@@ -3,7 +3,8 @@ SyncStray
 
 Desktop utility for sync all of your music from vk.com to your computer.
 
-Project written on CoffeeScript (JavaScript) with [node-webkit](https://github.com/rogerwang/node-webkit) and available for all popular platforms (Windows, OS X, Linux x64 and x32).
+Program written on CoffeeScript (JavaScript) with [node-webkit](https://github.com/rogerwang/node-webkit) and available for all popular platforms (Windows, OS X, Linux x64 and x32).
+Project based on [node-vk-music-sync](https://github.com/MaxSvargal/node-vk-music-sync) as evolution throught of this console utility.
 
 You can download packages from homepage: http://syncstray.maxsvargal.com/
 
