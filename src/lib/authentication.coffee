@@ -1,5 +1,4 @@
 https = require 'https'
-async = require 'async'
 gui = global.window.nwDispatcher.requireNwGui()
 path = require 'path'
 Datastore = require 'nedb'
