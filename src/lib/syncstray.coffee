@@ -10,8 +10,8 @@ gui = global.window.nwDispatcher.requireNwGui()
 http =  require 'http'
 webI = require './webInterface'
 Auth = require './authentication'
-collection = require('./collection')(params, webI)
-options = require('./options')(collection, webI)
+Collection = require './collection'
+#options = require './options'
 
 checkVersion = ->
   siteurl = 'http://syncstray.maxsvargal.com/'
@@ -35,9 +35,15 @@ checkVersion = ->
       
 initialize = ->
   auth = new Auth params
+  collection = new Collection params
 
-  options.initialize()
-  webI.registerDomEvents collection
+  auth.login (token) ->
+    collection.params.token = token
+    collection.get (data) ->
+      webI.showMusicList data
+      collection.download()
+      return
+###
   collection.getCachedCollection (data) ->
     if data.length is 0
       auth.login (token) ->
@@ -50,6 +56,7 @@ initialize = ->
       webI.showMusicList data
       collection.downloadCollection()
       return
+###
 
 if not params.dlPath
   checkVersion()

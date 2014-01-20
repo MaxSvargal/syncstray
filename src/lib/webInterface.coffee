@@ -78,33 +78,3 @@ module.exports =
   setDoneStatus: ->
     syncBtn = document.getElementById 'do-sync'
     syncBtn.className = 'stopped'
-
-  circleCounter: ->
-    setDoneStatus = @setDoneStatus
-    text = document.getElementById 'counter-label'
-    canvas = document.getElementById 'counter'
-    ctx = canvas.getContext '2d'
-    circ = Math.PI * 2
-    quart = Math.PI / 2
-
-    ctx.beginPath()
-    ctx.strokeStyle = '#fff'
-    ctx.lineCap = 'square'
-    ctx.closePath()
-    ctx.fill()
-    ctx.lineWidth = 6.0
-
-    imd = ctx.getImageData 0, 0, 60, 60
-
-    changeText = (percent) ->
-      text.innerHTML = percent + '%'
-      setDoneStatus() if percent is 100
-        
-    return {
-      draw: (current) ->
-        ctx.putImageData imd, 0, 0
-        ctx.beginPath()
-        ctx.arc 30, 30, 20, -(quart), ((circ * current) / 100) - quart, false
-        ctx.stroke()
-        changeText current
-    }

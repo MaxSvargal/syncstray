@@ -1,41 +1,66 @@
+'use strict'
+
 http = require 'http'
 https = require 'https'
 fs = require 'fs'
 gui = global.window.nwDispatcher.requireNwGui()
 path = require 'path'
 Datastore = require 'nedb'
-db = new Datastore { filename: path.join(gui.App.dataPath, 'collection.db'), autoload: true }
-#/Users/user/Library/Application Support/syncstray/collection.db
-stopFlag = false
-onProcess = 0
-collCurrPos = 0
-collectionBase = []
 
-module.exports = (params, webI) ->
+module.exports = class Collection
+  constructor: (@params) ->
+    @db = new Datastore { filename: path.join(gui.App.dataPath, 'collection.db'), autoload: true }
+    #/Users/user/Library/Application Support/syncstray/collection.db
+    @stopFlag = false
+    @onProcess = 0
+    @collCurrPos = 0
+    @collectionDB = []
+    @subscribers = []
+    @counter = @circleCounter()
 
-  counter = webI.circleCounter()
+  get: (callback) ->
+    @getCollectionFromServer (dl_collection) =>
+      @saveCollection dl_collection, =>
+        @getCachedCollection (cached_collection) ->
+          callback cached_collection
 
-  saveCollection = (data, callback) ->
-    db.insert data, (err) ->
+  download: (path) ->
+    if path then params.dlPath = path
+    @getCachedCollection (collection) =>
+      if collection.length isnt 0
+        @collectionDB = collection
+        numForLoop = @params.dlThreads - @onProcess - 1
+        for [0..numForLoop]
+          @loopDlFn()
+      else
+        @showNoTracks()
+
+  subscribe: (publisher) ->
+    @subscribers.push this
+    this
+
+  saveCollection: (data, callback) ->
+    @db.insert data, (err) ->
       if err then throw err
       console.log "Music list cached."
       callback()
 
-  getFileName = (data) ->
+  getCachedCollection: (callback) ->
+    @db.find {}, (err, collection) ->
+      callback collection
+
+  _getFileName: (data) ->
     "#{data.artist} - #{data.title}.mp3"
 
-  downloadTrack = (data, callback) ->
-    filename = getFileName data
-    #console.log "Start download track", filename
-    file = fs.createWriteStream "#{params.dlPath}/#{filename}", { flags: 'a' }
-
-    file.on 'error', (e) ->
-      console.log "Error write file '#{params.dlPath}/#{filename}'. Aborted."
+  downloadTrack: (data, callback) ->
+    filename = @_getFileName data
+    console.log "#{@params.dlPath}/#{filename}"
+    file = fs.createWriteStream "#{@params.dlPath}/#{filename}", { flags: 'a' }
 
     http.get data.url, (res) ->
       fsize = res.headers['content-length']
       len = 0
-      onProcess++
+      @onProcess++
       res.on 'data', (chunk) ->
         file.write chunk
         len += chunk.length
@@ -43,25 +68,17 @@ module.exports = (params, webI) ->
         webI.setProgressBar data.aid, percent
 
       res.on 'error', ->
-        onProcess--
-        console.log "Error with file '#{params.dlPath}/#{filename}'. Aborted."
-        response.destroy()
+        console.log "Error with file '#{@params.dlPath}/#{filename}'. Aborted."
 
       res.on 'end', ->
         file.end()
-        onProcess--
-        #console.log filename, " downloaded."
-        callback() if stopFlag is false
+        @onProcess--
+        callback() if @stopFlag is false
 
-  checkOnExists = (data, callback) ->
-    filename = getFileName data
-    fs.exists "#{params.dlPath}/#{filename}", (exists) ->
-      callback exists
-
-  loopDlFn = ->
-    track = collectionBase[collCurrPos++]
-    currPerc = collCurrPos * 100 / collectionBase.length
-    counter.draw (currPerc).toFixed(1)
+  loopDlFn: ->
+    track = @collectionDB[@collCurrPos++]
+    currPerc = @collCurrPos * 100 / @collectionDB.length
+    @counter.draw (currPerc).toFixed(1)
     return if not track
     # Trim strings for corrective filename
     try
@@ -74,69 +91,87 @@ module.exports = (params, webI) ->
       for symbol in filteredSymbols
         track.artist = track.artist.replace symbol[0], symbol[1]
         track.title = track.title.replace symbol[0], symbol[1]
-
     catch error
-      console.log error.toString()
+      console.log error
       return
-    checkOnExists track, (exists) ->
+
+    filename = @_getFileName track
+    fs.exists "#{@params.dlPath}/#{filename}", (exists) =>
       if exists
         #console.log "#{track.artist} - #{track.title}.mp3" + ' already exists.'
-        webI.setStatus 'downloaded', track.aid
-        loopDlFn()
+        @setStatus 'downloaded', track.aid
+        @loopDlFn()
       else
-        webI.setStatus 'onprogress', track.aid
-        downloadTrack track, -> loopDlFn()
+        @setStatus 'onprogress', track.aid
+        @downloadTrack track, -> @loopDlFn()
 
-  return {
-    getCachedCollection: (callback) ->
-      db.find {}, (err, collection) ->
-        callback collection
+  getCollectionFromServer: (callback) ->
+    getCachedCollection = @getCachedCollection
+    options = 
+      host: 'api.vk.com'
+      port: 443
+      path: "/method/audio.get?access_token=#{@params.token}"
 
-    downloadCollection: (path) ->
-      if path then params.dlPath = path
-      @getCachedCollection (collection) ->
-        if collection.length isnt 0
-          collectionBase = collection
-          numForLoop = params.dlThreads - onProcess - 1
-          for [0..numForLoop]
-            loopDlFn()
-        else
-          webI.showNoTracks()
+    https.get options, (res) ->
+      response = new String
+      res.setEncoding 'utf8'
+      res.on 'data', (chunk) -> response += chunk
+      res.on 'end', ->
+        collectionJson = (JSON.parse response).response
+        callback collectionJson
 
-    getCollectionFromServer: (callback) ->
-      getCachedCollection = @getCachedCollection
-      options = 
-        host: 'api.vk.com'
-        port: 443
-        path: "/method/audio.get?access_token=#{params.token}"
+  toggleDownload: ->
+    if @stopFlag is false
+      @stopFlag = true
+    else
+      @stopFlag = false
+      numForLoop = @params.dlThreads - @onProcess - 1
+      for [0..numForLoop]
+        @loopDlFn()
 
-      https.get options, (res) ->
-        response = new String
-        res.setEncoding 'utf8'
-        res.on 'data', (chunk) -> response += chunk
-        res.on 'end', ->
-          musicJson = (JSON.parse response).response
-          saveCollection musicJson, ->
-            getCachedCollection (collection) ->
-              callback collection
+  stopCurrDownloads: (callback) ->
+    @toggleDownload()
+    currPos = new Number @collCurrPos
+    for [0..params.dlThreads-1]
+      filename = @_getFileName @collectionDB[--currPos]
+      try
+        fs.unlinkSync "#{params.dlPath}/#{filename}"
+      catch err
+        "Error of remove file #{filename}: #{err}"
+    callback()
 
-    toggleDownload: ->
-      if stopFlag is false
-        stopFlag = true
-      else
-        stopFlag = false
-        numForLoop = params.dlThreads - onProcess - 1
-        for [0..numForLoop]
-          loopDlFn()
+  circleCounter: ->
+    setDoneStatus = @setDoneStatus
+    text = window.document.getElementById 'counter-label'
+    canvas = window.document.getElementById 'counter'
+    ctx = canvas.getContext '2d'
+    circ = Math.PI * 2
+    quart = Math.PI / 2
 
-    stopCurrDownloads: (callback) ->
-      @toggleDownload()
-      currPos = new Number collCurrPos
-      for [0..params.dlThreads-1]
-        filename = getFileName collectionBase[--currPos]
-        try
-          fs.unlinkSync "#{params.dlPath}/#{filename}"
-        catch err
-          "Error of remove file #{filename}: #{err}"
-      callback()
-  }
+    ctx.beginPath()
+    ctx.strokeStyle = '#fff'
+    ctx.lineCap = 'square'
+    ctx.closePath()
+    ctx.fill()
+    ctx.lineWidth = 6.0
+
+    imd = ctx.getImageData 0, 0, 60, 60
+
+    changeText = (percent) ->
+      text.innerHTML = percent + '%'
+      setDoneStatus() if percent is 100
+        
+    return {
+      draw: (current) ->
+        ctx.putImageData imd, 0, 0
+        ctx.beginPath()
+        ctx.arc 30, 30, 20, -(quart), ((circ * current) / 100) - quart, false
+        ctx.stroke()
+        changeText current
+    }
+
+  showNoTracks: ->
+    console.log "no tracks =("
+
+  setStatus: (status, id) ->
+    console.log "SET", status, id
