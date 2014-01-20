@@ -47,7 +47,7 @@ module.exports =
     ul.appendChild el
 
   chooseFolderDialog: (callback) ->
-    global.window.alert 'Please, select folder for upload.'
+    global.window.alert 'Please, select folder for download.'
     document.addEventListener 'DOMContentLoaded', ->
       chooser = document.getElementById 'choose-folder'
       chooser.addEventListener 'change', ->
