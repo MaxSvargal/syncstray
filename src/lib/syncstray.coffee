@@ -9,7 +9,7 @@ gui = global.window.nwDispatcher.requireNwGui()
 #gui.Window.get().showDevTools()
 http =  require 'http'
 webI = require './webInterface'
-auth = require('./authentication')(params)
+Auth = require './authentication'
 collection = require('./collection')(params, webI)
 options = require('./options')(collection, webI)
 
@@ -30,14 +30,17 @@ checkVersion = ->
           if parseFloat(versionArray[i]) > parseFloat(currVersionArray[i])
             global.window.alert 'I have new version! Please, update me!'
             gui.Shell.openExternal siteurl
+            return
           i++
       
 initialize = ->
+  auth = new Auth params
+
   options.initialize()
   webI.registerDomEvents collection
   collection.getCachedCollection (data) ->
     if data.length is 0
-      auth.initialize (token) ->
+      auth.login (token) ->
         params.token = token
         collection.getCollectionFromServer (music) ->
           webI.showMusicList music
