@@ -30,7 +30,7 @@ module.exports = (params, webI) ->
     file = fs.createWriteStream "#{params.dlPath}/#{filename}", { flags: 'a' }
 
     file.on 'error', (e) ->
-      console.log "Error write file '#{filename}'. Aborted."
+      console.log "Error write file '#{params.dlPath}/#{filename}'. Aborted."
 
     http.get data.url, (res) ->
       fsize = res.headers['content-length']
@@ -44,7 +44,8 @@ module.exports = (params, webI) ->
 
       res.on 'error', ->
         onProcess--
-        console.log "Error with file '#{filename}'. Aborted."
+        console.log "Error with file '#{params.dlPath}/#{filename}'. Aborted."
+        response.destroy()
 
       res.on 'end', ->
         file.end()
@@ -91,7 +92,8 @@ module.exports = (params, webI) ->
       db.find {}, (err, collection) ->
         callback collection
 
-    downloadCollection: ->
+    downloadCollection: (path) ->
+      if path then params.dlPath = path
       @getCachedCollection (collection) ->
         if collection.length isnt 0
           collectionBase = collection

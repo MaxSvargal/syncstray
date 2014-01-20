@@ -6,11 +6,12 @@ params =
   token: null
 
 gui = global.window.nwDispatcher.requireNwGui()
-http =  require 'http'
 #gui.Window.get().showDevTools()
+http =  require 'http'
 webI = require './webInterface'
 auth = require('./authentication')(params)
 collection = require('./collection')(params, webI)
+options = require('./options')(collection, webI)
 
 checkVersion = ->
   siteurl = 'http://syncstray.maxsvargal.com/'
@@ -19,8 +20,7 @@ checkVersion = ->
   versionRegExp = /^(\d+).(\d+).(\d+)$/
   http.get(url).on 'response', (resp) ->
     version = ''
-    resp.on 'data', (chunk) ->
-      version += chunk
+    resp.on 'data', (chunk) -> version += chunk
     resp.on 'end', ->
       versionArray = version.match versionRegExp
       if versionArray
@@ -28,12 +28,12 @@ checkVersion = ->
         i = 1
         for [1..3]
           if parseFloat(versionArray[i]) > parseFloat(currVersionArray[i])
-            console.log "On server new version!"
             global.window.alert 'I have new version! Please, update me!'
             gui.Shell.openExternal siteurl
           i++
       
 initialize = ->
+  options.initialize()
   webI.registerDomEvents collection
   collection.getCachedCollection (data) ->
     if data.length is 0
@@ -41,15 +41,16 @@ initialize = ->
         params.token = token
         collection.getCollectionFromServer (music) ->
           webI.showMusicList music
-          collection.downloadCollection music
+          collection.downloadCollection()
           return
     else
       webI.showMusicList data
-      collection.downloadCollection data
+      collection.downloadCollection()
       return
 
 if not params.dlPath
   checkVersion()
+  global.window.alert 'Please, select folder for download.'
   webI.chooseFolderDialog (folder) ->
     params.dlPath = folder
     global.window.localStorage.setItem 'dlPath', folder
