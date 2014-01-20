@@ -8,16 +8,21 @@
   <body>
     <header id="header">
       <a href="#" id="do-sync" class="rotate">sync</a>
-      <!-- <a href="#" id="do-options"></a> -->
+      <a href="#" id="do-options"></a>
       <canvas id="counter" width="60" height="60"></canvas>
       <div id="counter-label"></div>
       <h1>Sync<span>Stray</span></h1>
     </header>
     <div id="options" class="hidden">
       <div class="options-item">
-        <a href="#" id="change-folder" class="options-change-dir">
+        <a href="#" id="option_change_folder" class="options-btn">
           Change download directory
-          <span class="options-change-dir-current">/Users/maxsvargal/Music/SyncStray</span>
+          <span class="options-btn-current">/Users/maxsvargal/Music/SyncStray</span>
+        </a>
+
+        <a href="#" id="option_logout" class="options-btn">
+          Logout from vk.com
+          <span class="options-btn-current">maxsvargal</span>
         </a>
       </div>
       <div class="options-item">
@@ -27,13 +32,13 @@
       <div class="options-item">
         <a href="#" id="option_smooth_bars" class="options-item-checkbox checked">
           <div class="options-item-checkbox-icon"></div>
-          <div class="options-item-input-label">Enable smooth bars animation (GPU acceleration)</div>
+          <div class="options-item-input-label">Enable smooth animation of bars (GPU acceleration)</div>
         </a>
       </div>
       <div class="options-item">
         <a href="#" id="option_integrity" class="options-item-checkbox">
           <div class="options-item-checkbox-icon"></div>
-          <div class="options-item-input-label">Check integrity of downloaded files (caution: many http requests to server)</div>
+          <div class="options-item-input-label">Check hashes of downloaded files (caution: many http requests to the server)</div>
         </a>
       </div>
       <a href="#" class="bnt-close-options" id="do-options-close">Done</a>
