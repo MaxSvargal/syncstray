@@ -1,6 +1,6 @@
 document = window.document
 
-module.exports =
+module.exports = #class WebInterface
   showMusicList: (collection) ->
     ul = document.getElementById 'music-list'
     frag = document.createDocumentFragment()
@@ -22,22 +22,25 @@ module.exports =
       frag.appendChild li
 
     ul.appendChild frag
+    return
+
+
 
   setProgressBar: (id, percent) ->
+    scrollTo = (el) ->
+      offset = el.offsetTop - window.innerHeight
+      document.body.scrollTop = offset
+
+    setStatus = (status, id) ->
+      elClass = 'music-list-item'
+      el = document.getElementById "#{elClass}_#{id}"
+      el.className = elClass + ' ' + status
+
     el = document.getElementById "music-list-item-bar_#{id}"
-    if not el then return # throw new Error "No element with id #{id}"
+    if not el then throw new Error "No element with id #{id}"
     el.style.width = percent + '%'
-    if percent is 100 then @setStatus 'downloaded', id 
-    if percent is 0 then @scrollTo el.parentNode.nextSibling
-
-  setStatus: (status, id) ->
-    elClass = 'music-list-item'
-    el = document.getElementById "#{elClass}_#{id}"
-    el.className = elClass + ' ' + status
-
-  scrollTo: (el) ->
-    offset = el.offsetTop - window.innerHeight
-    document.body.scrollTop = offset
+    if percent is 100 then setStatus 'downloaded', id 
+    if percent is 0 then scrollTo el.parentNode.nextSibling
 
   showNoTracks: ->
     ul = document.getElementById 'music-list'
@@ -78,3 +81,33 @@ module.exports =
   setDoneStatus: ->
     syncBtn = document.getElementById 'do-sync'
     syncBtn.className = 'stopped'
+
+  circleCounter: ->
+    setDoneStatus = @setDoneStatus
+    text = global.window.document.getElementById 'counter-label'
+    canvas = global.window.document.getElementById 'counter'
+    ctx = canvas.getContext '2d'
+    circ = Math.PI * 2
+    quart = Math.PI / 2
+
+    ctx.beginPath()
+    ctx.strokeStyle = '#fff'
+    ctx.lineCap = 'square'
+    ctx.closePath()
+    ctx.fill()
+    ctx.lineWidth = 6.0
+
+    imd = ctx.getImageData 0, 0, 60, 60
+
+    changeText = (percent) ->
+      text.innerHTML = percent + '%'
+      setDoneStatus() if percent is 100
+        
+    return {
+      draw: (current) ->
+        ctx.putImageData imd, 0, 0
+        ctx.beginPath()
+        ctx.arc 30, 30, 20, -(quart), ((circ * current) / 100) - quart, false
+        ctx.stroke()
+        changeText current
+    }

@@ -16,7 +16,7 @@ module.exports = class Collection
     @collCurrPos = 0
     @collectionDB = []
     @subscribers = []
-    @counter = @circleCounter()
+    #@counter = @circleCounter()
 
   get: (callback) ->
     @getCollectionFromServer (dl_collection) =>
@@ -60,33 +60,33 @@ module.exports = class Collection
   downloadTrack: (data, callback) =>
     filename = @_getFileName data
     file = fs.createWriteStream "#{@params.dlPath}/#{filename}", { flags: 'a' }
-    onProcess = @onProcess
-    setProgressBar = @setProgressBar
-    stopFlag = @stopFlag
 
-    http.get data.url, (res) ->
+    req = http.get data.url, (res) =>
       fsize = res.headers['content-length']
       len = 0
-      onProcess++
+      @onProcess++
 
-      res.on 'data', (chunk) ->
+      res.on 'data', (chunk) =>
         file.write chunk
         len += chunk.length
         percent = Math.round len / fsize * 100
-        setProgressBar data.aid, percent
+        @setProgressBar data.aid, percent
 
-      res.on 'error', ->
-        console.log "Error with file '#{@params.dlPath}/#{filename}'. Aborted."
+      res.on 'error', (err) ->
+        console.log "Error with file '#{@params.dlPath}/#{filename}'. Aborted.", err
 
-      res.on 'end', ->
+      res.on 'end', =>
         file.end()
-        onProcess--
+        @onProcess--
         callback() if @stopFlag is false
+
+    req.on 'error', (err) ->
+      console.log "Request problem:", err.message
 
   loopDlFn: ->
     track = @collectionDB[@collCurrPos++]
     currPerc = @collCurrPos * 100 / @collectionDB.length
-    @counter.draw (currPerc).toFixed(1)
+    #@counter.draw (currPerc).toFixed(1)
     return if not track
     # Trim strings for corrective filename
     try
@@ -147,36 +147,6 @@ module.exports = class Collection
       catch err
         "Error of remove file #{filename}: #{err}"
     callback()
-
-  circleCounter: ->
-    setDoneStatus = @setDoneStatus
-    text = window.document.getElementById 'counter-label'
-    canvas = window.document.getElementById 'counter'
-    ctx = canvas.getContext '2d'
-    circ = Math.PI * 2
-    quart = Math.PI / 2
-
-    ctx.beginPath()
-    ctx.strokeStyle = '#fff'
-    ctx.lineCap = 'square'
-    ctx.closePath()
-    ctx.fill()
-    ctx.lineWidth = 6.0
-
-    imd = ctx.getImageData 0, 0, 60, 60
-
-    changeText = (percent) ->
-      text.innerHTML = percent + '%'
-      setDoneStatus() if percent is 100
-        
-    return {
-      draw: (current) ->
-        ctx.putImageData imd, 0, 0
-        ctx.beginPath()
-        ctx.arc 30, 30, 20, -(quart), ((circ * current) / 100) - quart, false
-        ctx.stroke()
-        changeText current
-    }
 
   showNoTracks: ->
     console.log "no tracks =("
