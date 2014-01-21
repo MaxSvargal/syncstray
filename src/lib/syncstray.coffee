@@ -6,7 +6,7 @@ params =
   token: null
 
 gui = global.window.nwDispatcher.requireNwGui()
-#gui.Window.get().showDevTools()
+gui.Window.get().showDevTools()
 http =  require 'http'
 webI = require './webInterface'
 Auth = require './authentication'

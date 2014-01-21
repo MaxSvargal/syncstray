@@ -25,7 +25,7 @@ module.exports = class Collection
           callback cached_collection
 
   download: (path) ->
-    if path then params.dlPath = path
+    if path then @params.dlPath = path
     @getCachedCollection (collection) =>
       if collection.length isnt 0
         @collectionDB = collection
@@ -52,28 +52,31 @@ module.exports = class Collection
   _getFileName: (data) ->
     "#{data.artist} - #{data.title}.mp3"
 
-  downloadTrack: (data, callback) ->
+  downloadTrack: (data, callback) =>
     filename = @_getFileName data
-    console.log "#{@params.dlPath}/#{filename}"
     file = fs.createWriteStream "#{@params.dlPath}/#{filename}", { flags: 'a' }
 
+    console.log "Start download file #{filename}"
+
+    onProcess = @onProcess
     http.get data.url, (res) ->
       fsize = res.headers['content-length']
       len = 0
-      @onProcess++
+      onProcess++
+
       res.on 'data', (chunk) ->
-        file.write chunk
+        file.write chunk, encoding='binary'
         len += chunk.length
         percent = Math.round len / fsize * 100
-        webI.setProgressBar data.aid, percent
+        #@webI.setProgressBar data.aid, percent
 
       res.on 'error', ->
         console.log "Error with file '#{@params.dlPath}/#{filename}'. Aborted."
 
       res.on 'end', ->
         file.end()
-        @onProcess--
-        callback() if @stopFlag is false
+        onProcess--
+        callback() #if @stopFlag is false
 
   loopDlFn: ->
     track = @collectionDB[@collCurrPos++]
@@ -95,15 +98,15 @@ module.exports = class Collection
       console.log error
       return
 
-    filename = @_getFileName track
+    filename = "#{track.artist} - #{track.title}.mp3"
     fs.exists "#{@params.dlPath}/#{filename}", (exists) =>
       if exists
-        #console.log "#{track.artist} - #{track.title}.mp3" + ' already exists.'
+        console.log "#{track.artist} - #{track.title}.mp3" + ' already exists.'
         @setStatus 'downloaded', track.aid
         @loopDlFn()
       else
         @setStatus 'onprogress', track.aid
-        @downloadTrack track, -> @loopDlFn()
+        @downloadTrack track, => @loopDlFn()
 
   getCollectionFromServer: (callback) ->
     getCachedCollection = @getCachedCollection
