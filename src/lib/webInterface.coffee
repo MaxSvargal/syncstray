@@ -25,7 +25,7 @@ module.exports =
 
   setProgressBar: (id, percent) ->
     el = document.getElementById "music-list-item-bar_#{id}"
-    if not el then throw new Error "No element with id #{id}"
+    if not el then return # throw new Error "No element with id #{id}"
     el.style.width = percent + '%'
     if percent is 100 then @setStatus 'downloaded', id 
     if percent is 0 then @scrollTo el.parentNode.nextSibling

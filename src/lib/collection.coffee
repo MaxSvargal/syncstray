@@ -35,9 +35,14 @@ module.exports = class Collection
       else
         @showNoTracks()
 
-  subscribe: (publisher) ->
-    @subscribers.push this
-    this
+  setStatus = (status, id) ->
+    console.log "SET", status, id
+
+  subscribe: (method, callback) ->
+    @subscribers.push {'method': method, 'callback': callback}
+
+  setProgressBar: (aid, percent) =>
+    subscriber.callback(aid, percent) for subscriber in @subscribers
 
   saveCollection: (data, callback) ->
     @db.insert data, (err) ->
@@ -55,20 +60,20 @@ module.exports = class Collection
   downloadTrack: (data, callback) =>
     filename = @_getFileName data
     file = fs.createWriteStream "#{@params.dlPath}/#{filename}", { flags: 'a' }
-
-    console.log "Start download file #{filename}"
-
     onProcess = @onProcess
+    setProgressBar = @setProgressBar
+    stopFlag = @stopFlag
+
     http.get data.url, (res) ->
       fsize = res.headers['content-length']
       len = 0
       onProcess++
 
       res.on 'data', (chunk) ->
-        file.write chunk, encoding='binary'
+        file.write chunk
         len += chunk.length
         percent = Math.round len / fsize * 100
-        #@webI.setProgressBar data.aid, percent
+        setProgressBar data.aid, percent
 
       res.on 'error', ->
         console.log "Error with file '#{@params.dlPath}/#{filename}'. Aborted."
@@ -76,7 +81,7 @@ module.exports = class Collection
       res.on 'end', ->
         file.end()
         onProcess--
-        callback() #if @stopFlag is false
+        callback() if @stopFlag is false
 
   loopDlFn: ->
     track = @collectionDB[@collCurrPos++]
@@ -98,14 +103,14 @@ module.exports = class Collection
       console.log error
       return
 
-    filename = "#{track.artist} - #{track.title}.mp3"
+    filename = @_getFileName track
     fs.exists "#{@params.dlPath}/#{filename}", (exists) =>
       if exists
         console.log "#{track.artist} - #{track.title}.mp3" + ' already exists.'
-        @setStatus 'downloaded', track.aid
+        setStatus 'downloaded', track.aid
         @loopDlFn()
       else
-        @setStatus 'onprogress', track.aid
+        setStatus 'onprogress', track.aid
         @downloadTrack track, => @loopDlFn()
 
   getCollectionFromServer: (callback) ->
@@ -175,6 +180,3 @@ module.exports = class Collection
 
   showNoTracks: ->
     console.log "no tracks =("
-
-  setStatus: (status, id) ->
-    console.log "SET", status, id

@@ -37,6 +37,8 @@ initialize = ->
   auth = new Auth params
   collection = new Collection params
 
+  collection.subscribe 'setProgressBar', webI.setProgressBar
+
   auth.login (token) ->
     collection.params.token = token
     collection.get (data) ->
