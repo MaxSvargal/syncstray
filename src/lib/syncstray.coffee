@@ -2,16 +2,17 @@ params =
   appID: '4027411'
   appSecret: 'MDn6yOgRLmkWBbm1PTFL'
   dlPath: global.window.localStorage.getItem 'dlPath'
-  dlThreads: 4
+  dlThreads: 2
   token: null
 
 gui = global.window.nwDispatcher.requireNwGui()
-gui.Window.get().showDevTools()
+#gui.Window.get().showDevTools()
 http =  require 'http'
-webI = require './webInterface'
+WebI = require './webInterface'
+webI = new WebI
 Auth = require './authentication'
 Collection = require './collection'
-#options = require './options'
+options = require './options'
 
 checkVersion = ->
   siteurl = 'http://syncstray.maxsvargal.com/'
@@ -38,6 +39,7 @@ initialize = ->
   collection = new Collection params
 
   collection.subscribe 'setProgressBar', webI.setProgressBar
+  collection.subscribe 'circleCounter', webI.circleCounter
 
   auth.login (token) ->
     collection.params.token = token
@@ -45,20 +47,6 @@ initialize = ->
       webI.showMusicList data
       collection.download()
       return
-###
-  collection.getCachedCollection (data) ->
-    if data.length is 0
-      auth.login (token) ->
-        params.token = token
-        collection.getCollectionFromServer (music) ->
-          webI.showMusicList music
-          collection.downloadCollection()
-          return
-    else
-      webI.showMusicList data
-      collection.downloadCollection()
-      return
-###
 
 if not params.dlPath
   checkVersion()

@@ -10,7 +10,7 @@ module.exports = (collection, webI) ->
 
   logout = ->
     collection.toggleDownload()
-    #auth.logout()
+    auth.logout()
     ###
       auth.initialize (token) ->
         collection.getCollectionFromServer (music) ->

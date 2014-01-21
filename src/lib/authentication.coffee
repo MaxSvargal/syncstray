@@ -21,7 +21,7 @@ module.exports = class Auth
   logout: (callback) ->
     url = "http://api.vk.com/oauth/logout?client_id=#{@params.appID}"
     childWindow = gui.Window.open url
-    #childWindow.hide()
+    childWindow.hide()
     childWindow.on 'loaded', -> callback()
 
 

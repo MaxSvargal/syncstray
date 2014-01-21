@@ -1,7 +1,7 @@
 {
   "name": "SyncStray",
   "description": "Utility for sync all of your music from vk.com to your computer.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "maintainers": [
     {
       "name": "MaxSvargal",

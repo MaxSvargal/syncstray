@@ -16,7 +16,6 @@ module.exports = class Collection
     @collCurrPos = 0
     @collectionDB = []
     @subscribers = []
-    #@counter = @circleCounter()
 
   get: (callback) ->
     @getCollectionFromServer (dl_collection) =>
@@ -42,7 +41,10 @@ module.exports = class Collection
     @subscribers.push {'method': method, 'callback': callback}
 
   setProgressBar: (aid, percent) =>
-    subscriber.callback(aid, percent) for subscriber in @subscribers
+    subscriber.callback(aid, percent) for subscriber in @subscribers when subscribers.method is 'setProgressBar'
+
+  circleCounter: (percent) =>
+    subscribers.callback(percent) for subscribers in @subscribers when subscribers.method is 'circleCounter'
 
   saveCollection: (data, callback) ->
     @db.insert data, (err) ->
@@ -58,6 +60,7 @@ module.exports = class Collection
     "#{data.artist} - #{data.title}.mp3"
 
   downloadTrack: (data, callback) =>
+    console.log 'start dl ', data.title
     filename = @_getFileName data
     file = fs.createWriteStream "#{@params.dlPath}/#{filename}", { flags: 'a' }
 
@@ -86,7 +89,7 @@ module.exports = class Collection
   loopDlFn: ->
     track = @collectionDB[@collCurrPos++]
     currPerc = @collCurrPos * 100 / @collectionDB.length
-    #@counter.draw (currPerc).toFixed(1)
+    @circleCounter (currPerc).toFixed(1)
     return if not track
     # Trim strings for corrective filename
     try

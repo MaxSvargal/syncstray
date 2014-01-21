@@ -1,6 +1,9 @@
 document = window.document
 
-module.exports = #class WebInterface
+module.exports = class WebInterface
+  constructor: ->
+    @circleCounter = @circleCounterCounstructor().draw
+
   showMusicList: (collection) ->
     ul = document.getElementById 'music-list'
     frag = document.createDocumentFragment()
@@ -23,8 +26,6 @@ module.exports = #class WebInterface
 
     ul.appendChild frag
     return
-
-
 
   setProgressBar: (id, percent) ->
     scrollTo = (el) ->
@@ -82,7 +83,7 @@ module.exports = #class WebInterface
     syncBtn = document.getElementById 'do-sync'
     syncBtn.className = 'stopped'
 
-  circleCounter: ->
+  circleCounterCounstructor: ->
     setDoneStatus = @setDoneStatus
     text = global.window.document.getElementById 'counter-label'
     canvas = global.window.document.getElementById 'counter'
