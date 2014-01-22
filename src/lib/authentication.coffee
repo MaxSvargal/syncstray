@@ -1,6 +1,7 @@
 https = require 'https'
 gui = global.window.nwDispatcher.requireNwGui()
 path = require 'path'
+fs = require 'fs'
 
 module.exports = class Auth
   constructor: (@params) ->
@@ -18,12 +19,11 @@ module.exports = class Auth
           false
 
 
-  logout: (callback) ->
-    url = "http://api.vk.com/oauth/logout?client_id=#{@params.appID}"
-    childWindow = gui.Window.open url
-    childWindow.hide()
-    childWindow.on 'loaded', -> callback()
-
+  logout: (callback) =>
+    fs.unlink gui.App.dataPath + '/cookies', (err) ->
+      console.log err.message if err
+      @login()
+      callback()
 
   getPermissions: (callback) ->
     url = "https://oauth.vk.com/authorize?client_id=#{@params.appID}&scope=audio&response_type=code"

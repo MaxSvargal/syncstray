@@ -10,12 +10,16 @@ Datastore = require 'nedb'
 module.exports = class Collection
   constructor: (@params) ->
     @db = new Datastore { filename: path.join(gui.App.dataPath, 'collection.db'), autoload: true }
+    @db.ensureIndex { fieldName: 'aid', unique: true }
     #/Users/user/Library/Application Support/syncstray/collection.db
     @stopFlag = false
     @onProcess = 0
     @collCurrPos = 0
     @collectionDB = []
     @subscribers = []
+
+  subscribe: (method, callback) ->
+    @subscribers.push {'method': method, 'callback': callback}
 
   get: (callback) ->
     @getCollectionFromServer (dl_collection) =>
@@ -34,21 +38,18 @@ module.exports = class Collection
       else
         @showNoTracks()
 
-  setStatus = (status, id) ->
-    console.log "SET", status, id
-
-  subscribe: (method, callback) ->
-    @subscribers.push {'method': method, 'callback': callback}
+  setItemStatus: (status, id) =>
+    subscriber.callback(status, id) for subscriber in @subscribers when subscriber.method is 'setItemStatus'
 
   setProgressBar: (aid, percent) =>
-    subscriber.callback(aid, percent) for subscriber in @subscribers when subscribers.method is 'setProgressBar'
+    subscriber.callback(aid, percent) for subscriber in @subscribers when subscriber.method is 'setProgressBar'
 
   circleCounter: (percent) =>
-    subscribers.callback(percent) for subscribers in @subscribers when subscribers.method is 'circleCounter'
+    subscriber.callback(percent) for subscriber in @subscribers when subscriber.method is 'circleCounter'
 
   saveCollection: (data, callback) ->
     @db.insert data, (err) ->
-      if err then throw err
+      if err then console.log err.message
       console.log "Music list cached."
       callback()
 
@@ -110,10 +111,10 @@ module.exports = class Collection
     fs.exists "#{@params.dlPath}/#{filename}", (exists) =>
       if exists
         console.log "#{track.artist} - #{track.title}.mp3" + ' already exists.'
-        setStatus 'downloaded', track.aid
+        @setItemStatus 'downloaded', track.aid
         @loopDlFn()
       else
-        setStatus 'onprogress', track.aid
+        @setItemStatus 'onprogress', track.aid
         @downloadTrack track, => @loopDlFn()
 
   getCollectionFromServer: (callback) ->
@@ -131,16 +132,21 @@ module.exports = class Collection
         collectionJson = (JSON.parse response).response
         callback collectionJson
 
-  toggleDownload: ->
+  toggleDownload: =>
     if @stopFlag is false
+      console.log "STOP DL!"
       @stopFlag = true
     else
+      console.log "START DL!"
       @stopFlag = false
       numForLoop = @params.dlThreads - @onProcess - 1
       for [0..numForLoop]
         @loopDlFn()
 
-  stopCurrDownloads: (callback) ->
+  reloadCollectionDl: =>
+    console.log "RELOAD DL!"
+
+  stopCurrDownloads: (callback) =>
     @toggleDownload()
     currPos = new Number @collCurrPos
     for [0..params.dlThreads-1]

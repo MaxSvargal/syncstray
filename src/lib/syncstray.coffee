@@ -8,11 +8,14 @@ params =
 gui = global.window.nwDispatcher.requireNwGui()
 #gui.Window.get().showDevTools()
 http =  require 'http'
-WebI = require './webInterface'
-webI = new WebI
+webi = require './webinterface'
 Auth = require './authentication'
 Collection = require './collection'
-options = require './options'
+
+auth = new Auth params
+collection = new Collection params
+webi = new webi
+
 
 checkVersion = ->
   siteurl = 'http://syncstray.maxsvargal.com/'
@@ -33,31 +36,32 @@ checkVersion = ->
             gui.Shell.openExternal siteurl
             return
           i++
-      
-initialize = ->
-  auth = new Auth params
-  collection = new Collection params
 
-  collection.subscribe 'setProgressBar', webI.setProgressBar
-  collection.subscribe 'circleCounter', webI.circleCounter
+checkDlFolder = (callback) ->
+  if not params.dlPath
+    global.window.alert 'Please, select folder for download.'
+    webi.chooseFolderDialog (folder) ->
+      params.dlPath = folder
+      global.window.localStorage.setItem 'dlPath', folder
+      callback()
+  else
+    callback()
+
+initialize = ->
+  collection.subscribe 'setProgressBar', webi.setProgressBar
+  collection.subscribe 'circleCounter', webi.circleCounter
+  collection.subscribe 'setItemStatus', webi.setItemStatus
+  webi.subscribe 'toggleDownload', collection.toggleDownload
+  webi.subscribe 'reloadCollectionDl', collection.reloadCollectionDl
+  webi.subscribe 'logout', auth.logout
 
   auth.login (token) ->
     collection.params.token = token
     collection.get (data) ->
-      webI.showMusicList data
+      webi.showMusicList data
       collection.download()
       return
 
-if not params.dlPath
-  checkVersion()
-  global.window.alert 'Please, select folder for download.'
-  webI.chooseFolderDialog (folder) ->
-    params.dlPath = folder
-    global.window.localStorage.setItem 'dlPath', folder
-    initialize()
-else
-  initialize()
-  checkVersion()
 
 win = gui.Window.get()
 win.on 'close', ->
@@ -65,3 +69,8 @@ win.on 'close', ->
   collection.stopCurrDownloads ->
     win.close true
     gui.App.quit()
+
+
+checkDlFolder ->
+  initialize()
+  checkVersion()

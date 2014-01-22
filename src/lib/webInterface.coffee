@@ -2,7 +2,54 @@ document = window.document
 
 module.exports = class WebInterface
   constructor: ->
+    @subscribers = []
     @circleCounter = @circleCounterCounstructor().draw
+    @registerDomEvents()
+
+  subscribe: (method, callback) ->
+    @subscribers.push {'method': method, 'callback': callback}
+
+  toggleDownload: ->
+    subscriber.callback() for subscriber in @subscribers when subscriber.method is 'toggleDownload'
+
+  reloadCollectionDl: ->
+    subscriber.callback() for subscriber in @subscribers when subscriber.method is 'reloadCollectionDl'
+
+  logout: (callback) =>
+    for subscriber in @subscribers when subscriber.method is 'logout'
+      subscriber.callback (callback) ->
+        console.log callback
+
+  registerDomEvents: (collection) ->
+    document.addEventListener 'DOMContentLoaded', =>
+      syncBtn = document.getElementById 'do-sync'
+      syncBtn.addEventListener 'click', (ev) =>
+        ev.preventDefault()
+        @toggleDownload()
+        if syncBtn.classList.contains 'stopped'
+          syncBtn.className = 'rotate'
+        else
+          syncBtn.className = 'stopped'
+            
+      optionsOverlay = document.getElementById 'options'
+
+      optionsBtn = document.getElementById 'do-options'
+      optionsBtn.addEventListener 'click', (ev) ->
+        ev.preventDefault()
+        optionsOverlay.className = ''
+
+      closeConfigBtn = document.getElementById 'do-options-close'
+      closeConfigBtn.addEventListener 'click' , (ev) ->
+        ev.preventDefault()
+        optionsOverlay.className += ' hidden'
+
+      # Options
+      btn_changeDir = document.getElementById 'option_change_folder'
+      btn_logout = document.getElementById 'option_logout'
+      btn_threads = document.getElementById 'options_threads'
+      
+      btn_changeDir.addEventListener 'click', @changeDlFolder
+      btn_logout.addEventListener 'click', @logout
 
   showMusicList: (collection) ->
     ul = document.getElementById 'music-list'
@@ -27,21 +74,21 @@ module.exports = class WebInterface
     ul.appendChild frag
     return
 
-  setProgressBar: (id, percent) ->
-    scrollTo = (el) ->
-      offset = el.offsetTop - window.innerHeight
-      document.body.scrollTop = offset
+  scrollTo: (el) ->
+    offset = el.offsetTop - window.innerHeight
+    document.body.scrollTop = offset
 
-    setStatus = (status, id) ->
-      elClass = 'music-list-item'
-      el = document.getElementById "#{elClass}_#{id}"
-      el.className = elClass + ' ' + status
+  setItemStatus: (status, id) ->
+    elClass = 'music-list-item'
+    el = document.getElementById "#{elClass}_#{id}"
+    el.className = elClass + ' ' + status
 
+  setProgressBar: (id, percent) =>
     el = document.getElementById "music-list-item-bar_#{id}"
     if not el then throw new Error "No element with id #{id}"
     el.style.width = percent + '%'
-    if percent is 100 then setStatus 'downloaded', id 
-    if percent is 0 then scrollTo el.parentNode.nextSibling
+    if percent is 100 then @setItemStatus 'downloaded', id 
+    if percent is 0 then @scrollTo el.parentNode.nextSibling
 
   showNoTracks: ->
     ul = document.getElementById 'music-list'
@@ -53,38 +100,20 @@ module.exports = class WebInterface
   chooseFolderDialog: (callback) ->
     chooser = document.getElementById 'choose-folder'
     chooser.addEventListener 'change', ->
-      callback this.value
+      callback @value
     chooser.click()
 
-  registerDomEvents: (collection) ->
-    document.addEventListener 'DOMContentLoaded', ->
-      syncBtn = document.getElementById 'do-sync'
-      syncBtn.addEventListener 'click', (ev) ->
-        ev.preventDefault()
-        collection.toggleDownload()
-        if syncBtn.classList.contains 'stopped'
-          syncBtn.className = 'rotate'
-        else
-          syncBtn.className = 'stopped'
-            
-      optionsOverlay = document.getElementById 'options'
-
-      optionsBtn = document.getElementById 'do-options'
-      optionsBtn.addEventListener 'click', (ev) ->
-        ev.preventDefault()
-        optionsOverlay.className = ''
-
-      closeConfigBtn = document.getElementById 'do-options-close'
-      closeConfigBtn.addEventListener 'click' , (ev) ->
-        ev.preventDefault()
-        optionsOverlay.className += ' hidden'
-
+  changeDlFolder: =>
+    @toggleDownload()
+    @chooseFolderDialog (folder) =>
+      global.window.localStorage.setItem 'dlPath', folder
+      @reloadCollectionDl()
+    
   setDoneStatus: ->
     syncBtn = document.getElementById 'do-sync'
     syncBtn.className = 'stopped'
 
-  circleCounterCounstructor: ->
-    setDoneStatus = @setDoneStatus
+  circleCounterCounstructor: =>
     text = global.window.document.getElementById 'counter-label'
     canvas = global.window.document.getElementById 'counter'
     ctx = canvas.getContext '2d'
@@ -96,13 +125,13 @@ module.exports = class WebInterface
     ctx.lineCap = 'square'
     ctx.closePath()
     ctx.fill()
-    ctx.lineWidth = 6.0
+    ctx.lineWidth = 5.0
 
     imd = ctx.getImageData 0, 0, 60, 60
 
     changeText = (percent) ->
       text.innerHTML = percent + '%'
-      setDoneStatus() if percent is 100
+      @setDoneStatus() if percent is 100
         
     return {
       draw: (current) ->
