@@ -9,8 +9,8 @@ module.exports = class Auth
 
   login: (callback) ->
     @getPermissions (code) =>
-      @code = code
-      @getTokenFromServer (token) ->
+      @setCode code
+      @getTokenFromServer code, (token) ->
         callback "Getting token fail." if token.type is 'error'
         console.log "Get ready with token ", token
         if typeof token is 'string'
@@ -18,14 +18,19 @@ module.exports = class Auth
           callback token
           false
 
-
   logout: (callback) =>
     fs.unlink gui.App.dataPath + '/cookies', (err) ->
       console.log err.message if err
+      @setCode null
       @login()
       callback()
 
   getPermissions: (callback) ->
+    # If permission code is saved, return it
+    code = getCode()
+    callback code if code
+    return
+
     url = "https://oauth.vk.com/authorize?client_id=#{@params.appID}&scope=audio&response_type=code"
     childWindow = gui.Window.open url, {
       width: 800
@@ -37,19 +42,18 @@ module.exports = class Auth
 
     childWindow.on 'loaded', ->
       hash = @window.location.hash
-      code = hash.match /#code=(\w+)/, hash
+      code = hash.match(/#code=(\w+)/, hash)[1]
       if code
         @close()
-        callback code[1]
+        callback code
       else
         @show()
 
-
-  getTokenFromServer: (callback) ->
+  getTokenFromServer: (code, callback) ->
     options =
       host: 'oauth.vk.com'
       port: 443
-      path: "/access_token?client_id=#{@params.appID}&client_secret=#{@params.appSecret}&code=#{@code}"
+      path: "/access_token?client_id=#{@params.appID}&client_secret=#{@params.appSecret}&code=#{code}"
 
     https.get options, (res) ->
       response = new String
@@ -62,3 +66,9 @@ module.exports = class Auth
           callback json.access_token
         else
           callback { type: 'error', message: json.error }
+
+  setCode: (code) ->
+    global.window.localStorage.setItem 'authCode', code
+
+  getCode: ->
+    global.window.localStorage.getItem 'authCode'

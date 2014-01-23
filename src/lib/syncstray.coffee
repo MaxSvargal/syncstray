@@ -56,7 +56,7 @@ initialize = ->
   webi.subscribe 'logout', auth.logout
 
   auth.login (token) ->
-    collection.params.token = token
+    #collection.params.token = token
     collection.get (data) ->
       webi.showMusicList data
       collection.download()
