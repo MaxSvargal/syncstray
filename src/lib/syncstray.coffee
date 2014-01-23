@@ -1,10 +1,11 @@
 params =
-  appID: '4027411'
-  appSecret: 'MDn6yOgRLmkWBbm1PTFL'
+  appID: '4138123'
+  appSecret: '9c7G6T5bZkVE097J3AMI'
   dlPath: global.window.localStorage.getItem 'dlPath'
   dlThreads: 2
   token: null
 
+#require 'coffee-trace'
 gui = global.window.nwDispatcher.requireNwGui()
 #gui.Window.get().showDevTools()
 http =  require 'http'
@@ -54,9 +55,10 @@ initialize = ->
   webi.subscribe 'toggleDownload', collection.toggleDownload
   webi.subscribe 'reloadCollectionDl', collection.reloadCollectionDl
   webi.subscribe 'logout', auth.logout
+  webi.subscribe 'getUserData', auth.getUserData
 
   auth.login (token) ->
-    #collection.params.token = token
+    collection.params.token = token
     collection.get (data) ->
       webi.showMusicList data
       collection.download()
