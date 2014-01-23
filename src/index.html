@@ -8,6 +8,7 @@
   <body>
     <header id="header">
       <a href="#" id="do-sync" class="rotate">sync</a>
+      <a href="#" id="do-watch">watch</a>
       <a href="#" id="do-options"></a>
       <canvas id="counter" width="60" height="60"></canvas>
       <div id="counter-label"></div>
@@ -17,7 +18,7 @@
       <div class="options-item">
         <a href="#" id="option_change_folder" class="options-btn">
           Change download directory
-          <span class="options-btn-current">/Users/maxsvargal/Music/SyncStray</span>
+          <span class="options-btn-current" id="option_change_folder_label">/Users/maxsvargal/Music/SyncStray</span>
         </a>
 
         <a href="#" id="option_logout" class="options-btn">
@@ -27,7 +28,7 @@
       </div>
       <div class="options-item">
         <input class="options-item-input" id="options_threads" type="text" value="4" maxlength="2" min="1">
-        <div class="options-item-input-label">Download threads number</div>
+        <div class="options-item-input-label">Number of download threads</div>
       </div>
       <div class="options-item">
         <a href="#" id="option_smooth_bars" class="options-item-checkbox checked">

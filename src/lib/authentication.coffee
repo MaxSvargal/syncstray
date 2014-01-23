@@ -5,32 +5,26 @@ fs = require 'fs'
 
 module.exports = class Auth
   constructor: (@params) ->
+    @userData = null
     return
 
   login: (callback) ->
     @getPermissions (code) =>
-      @setCode code
       @getTokenFromServer code, (token) ->
-        callback "Getting token fail." if token.type is 'error'
+        callback "Getting token fail." if token.type is 'error' or token.error
         console.log "Get ready with token ", token
+        @token = token
+        @getUserFromServer()
         if typeof token is 'string'
-          @token = token
           callback token
-          false
+          return
 
-  logout: (callback) =>
-    fs.unlink gui.App.dataPath + '/cookies', (err) ->
+  logout: =>
+    fs.unlink gui.App.dataPath + '/cookies', (err) =>
       console.log err.message if err
-      @setCode null
-      @login()
-      callback()
+      window.alert "Please, restart the application for re-login."
 
-  getPermissions: (callback) ->
-    # If permission code is saved, return it
-    code = getCode()
-    callback code if code
-    return
-
+  getPermissions: (callback) =>
     url = "https://oauth.vk.com/authorize?client_id=#{@params.appID}&scope=audio&response_type=code"
     childWindow = gui.Window.open url, {
       width: 800
@@ -42,10 +36,10 @@ module.exports = class Auth
 
     childWindow.on 'loaded', ->
       hash = @window.location.hash
-      code = hash.match(/#code=(\w+)/, hash)[1]
+      code = hash.match /#code=(\w+)/, hash
       if code
         @close()
-        callback code
+        callback code[1]
       else
         @show()
 
@@ -67,8 +61,23 @@ module.exports = class Auth
         else
           callback { type: 'error', message: json.error }
 
-  setCode: (code) ->
-    global.window.localStorage.setItem 'authCode', code
+  getUserFromServer: (callback) ->
+    options = 
+      host: 'api.vk.com'
+      port: 443
+      path: "/method/users.get?access_token=#{@token}"
 
-  getCode: ->
-    global.window.localStorage.getItem 'authCode'
+    https.get options, (res) ->
+      response = new String
+      res.setEncoding 'utf8'
+      res.on 'data', (chunk) -> response += chunk
+      res.on 'end', ->
+        @userData = (JSON.parse response).response
+        callback @userData
+
+  getUserData: (callback) ->
+    if @userData is null
+      callback @getUserFromServer()
+    else
+      callback @userData
+        

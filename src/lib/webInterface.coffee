@@ -1,10 +1,12 @@
 document = window.document
 
 module.exports = class WebInterface
-  constructor: ->
+  constructor: (@params) ->
     @subscribers = []
     @circleCounter = @circleCounterCounstructor().draw
     @registerDomEvents()
+
+    @changeDlFolderLabel @params.dlPath
 
   subscribe: (method, callback) ->
     @subscribers.push {'method': method, 'callback': callback}
@@ -12,13 +14,11 @@ module.exports = class WebInterface
   toggleDownload: ->
     subscriber.callback() for subscriber in @subscribers when subscriber.method is 'toggleDownload'
 
-  reloadCollectionDl: ->
-    subscriber.callback() for subscriber in @subscribers when subscriber.method is 'reloadCollectionDl'
+  reloadCollectionDl: (folder) ->
+    subscriber.callback(folder) for subscriber in @subscribers when subscriber.method is 'reloadCollectionDl'
 
-  logout: (callback) =>
-    for subscriber in @subscribers when subscriber.method is 'logout'
-      subscriber.callback (callback) ->
-        console.log callback
+  logout: =>
+    subscriber.callback() for subscriber in @subscribers when subscriber.method is 'logout'
 
   registerDomEvents: (collection) ->
     document.addEventListener 'DOMContentLoaded', =>
@@ -83,6 +83,14 @@ module.exports = class WebInterface
     el = document.getElementById "#{elClass}_#{id}"
     el.className = elClass + ' ' + status
 
+  resetItemsStatus: ->
+    elems = document.getElementsByClassName 'music-list-item'
+    bars = document.getElementsByClassName 'music-list-item-bar'
+    for el in elems
+      el.className = 'music-list-item'
+    for bar in bars
+      bar.style.width = 0
+
   setProgressBar: (id, percent) =>
     el = document.getElementById "music-list-item-bar_#{id}"
     if not el then throw new Error "No element with id #{id}"
@@ -106,8 +114,14 @@ module.exports = class WebInterface
   changeDlFolder: =>
     @toggleDownload()
     @chooseFolderDialog (folder) =>
+      @changeDlFolderLabel folder
       global.window.localStorage.setItem 'dlPath', folder
-      @reloadCollectionDl()
+      @resetItemsStatus()
+      @reloadCollectionDl folder
+
+  changeDlFolderLabel: (label) ->
+    label = document.getElementById 'option_change_folder_label'
+    label.innerHTML = label
     
   setDoneStatus: ->
     syncBtn = document.getElementById 'do-sync'

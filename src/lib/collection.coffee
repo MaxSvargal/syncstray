@@ -110,7 +110,7 @@ module.exports = class Collection
     filename = @_getFileName track
     fs.exists "#{@params.dlPath}/#{filename}", (exists) =>
       if exists
-        console.log "#{track.artist} - #{track.title}.mp3" + ' already exists.'
+        #console.log "#{track.artist} - #{track.title}.mp3" + ' already exists.'
         @setItemStatus 'downloaded', track.aid
         @loopDlFn()
       else
@@ -118,7 +118,6 @@ module.exports = class Collection
         @downloadTrack track, => @loopDlFn()
 
   getCollectionFromServer: (callback) ->
-    getCachedCollection = @getCachedCollection
     options = 
       host: 'api.vk.com'
       port: 443
@@ -134,20 +133,23 @@ module.exports = class Collection
 
   toggleDownload: =>
     if @stopFlag is false
-      console.log "STOP DL!"
       @stopFlag = true
     else
-      console.log "START DL!"
       @stopFlag = false
       numForLoop = @params.dlThreads - @onProcess - 1
       for [0..numForLoop]
         @loopDlFn()
 
-  reloadCollectionDl: =>
-    console.log "RELOAD DL!"
+  reloadCollectionDl: (folder) =>
+    @stopCurrDownloads()
+    @collCurrPos = 0
+    @stopFlag = false
+    @params.dlPath = folder
+    @download()
 
-  stopCurrDownloads: (callback) =>
-    @toggleDownload()
+  stopCurrDownloads: =>
+    return if @onProcess is 0
+    @stopFlag = true
     currPos = new Number @collCurrPos
     for [0..params.dlThreads-1]
       filename = @_getFileName @collectionDB[--currPos]
@@ -155,7 +157,7 @@ module.exports = class Collection
         fs.unlinkSync "#{params.dlPath}/#{filename}"
       catch err
         "Error of remove file #{filename}: #{err}"
-    callback()
 
   showNoTracks: ->
     console.log "no tracks =("
+
