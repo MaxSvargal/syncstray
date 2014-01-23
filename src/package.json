@@ -1,6 +1,6 @@
 {
   "name": "SyncStray",
-  "description": "Utility for sync all of your music from vk.com to your computer.",
+  "description": "Utility to synchronize your music from vk.com with your computer.",
   "version": "0.2.0",
   "maintainers": [
     {
