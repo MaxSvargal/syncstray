@@ -95,8 +95,8 @@ module.exports = class Collection
       console.log "Request problem:", err.message
 
   loopDlFn: ->
-    return if @params.dlThreads > @onProcess
-    
+    return if @onProcess > @params.dlThreads - 1
+
     track = @collectionDB[@collCurrPos++]
     currPerc = @collCurrPos * 100 / @collectionDB.length
     @circleCounter (currPerc).toFixed(1)

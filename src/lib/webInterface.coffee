@@ -6,6 +6,7 @@ module.exports = class WebInterface
     @circleCounter = @circleCounterCounstructor().draw
     @registerDomEvents()
     @changeDlFolderLabel @params.dlPath
+    @changeDlThreadsInput @params.dlThreads
 
   subscribe: (method, callback) ->
     @subscribers.push {'method': method, 'callback': callback}
@@ -130,6 +131,10 @@ module.exports = class WebInterface
   changeDlFolderLabel: (folder) ->
     label = document.getElementById 'options_change_folder_label'
     label.innerHTML = folder
+
+  changeDlThreadsInput: (threads) ->
+    input = document.getElementById 'options_threads'
+    input.value = threads
     
   setDoneStatus: ->
     syncBtn = document.getElementById 'do-sync'
