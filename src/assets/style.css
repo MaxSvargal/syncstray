@@ -214,9 +214,9 @@ h1 > span {
   .bnt-close-options {
     background: #FFC95C;
     padding: .5em 1em;
-    color: #fff;
+    color: #7b5200;
     text-decoration: none;
-    border-bottom: 2px solid #000;
+    border-bottom: 2px solid #af842d;
     float: right;
   }
 
