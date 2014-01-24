@@ -54,10 +54,9 @@ module.exports = class Collection
       callback()
 
   changeDlThreads: (threads) =>
-    console.log "THREADS CHANGED", threads
-    @params.dlThreads = parseInt threads
+    @params.dlThreads = threads
     numForLoop = @params.dlThreads - @onProcess - 1
-    if numForLoop > 0
+    if numForLoop >= 0
       for [0..numForLoop]
         @loopDlFn()
 

@@ -21,7 +21,9 @@ module.exports = class WebInterface
     subscriber.callback() for subscriber in @subscribers when subscriber.method is 'logout'
 
   changeDlThreads: (event) =>
-    subscriber.callback(event.target.value) for subscriber in @subscribers when subscriber.method is 'changeDlThreads'
+    threads = parseInt event.target.value
+    global.window.localStorage.setItem 'dlThreads', threads
+    subscriber.callback(threads) for subscriber in @subscribers when subscriber.method is 'changeDlThreads'
 
   getUserData: (userData) ->
     return if not userData

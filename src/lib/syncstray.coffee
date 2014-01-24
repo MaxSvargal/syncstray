@@ -2,7 +2,7 @@ params =
   appID: '4138123'
   appSecret: '9c7G6T5bZkVE097J3AMI'
   dlPath: global.window.localStorage.getItem 'dlPath'
-  dlThreads: 2
+  dlThreads: global.window.localStorage.getItem 'dlThreads' or 4
   token: null
 
 #require 'coffee-trace'
