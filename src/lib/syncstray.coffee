@@ -9,14 +9,13 @@ params =
 gui = global.window.nwDispatcher.requireNwGui()
 #gui.Window.get().showDevTools()
 http =  require 'http'
-webi = require './webinterface'
+Webi = require './webinterface'
 Auth = require './authentication'
 Collection = require './collection'
 
 auth = new Auth params
+webi = new Webi params
 collection = new Collection params
-webi = new webi
-
 
 checkVersion = ->
   siteurl = 'http://syncstray.maxsvargal.com/'
@@ -55,7 +54,8 @@ initialize = ->
   webi.subscribe 'toggleDownload', collection.toggleDownload
   webi.subscribe 'reloadCollectionDl', collection.reloadCollectionDl
   webi.subscribe 'logout', auth.logout
-  webi.subscribe 'getUserData', auth.getUserData
+  webi.subscribe 'changeDlThreads', collection.changeDlThreads
+  auth.subscribe 'getUserData', webi.getUserData
 
   auth.login (token) ->
     collection.params.token = token
@@ -68,9 +68,8 @@ initialize = ->
 win = gui.Window.get()
 win.on 'close', ->
   @hide()
-  collection.stopCurrDownloads ->
-    win.close true
-    gui.App.quit()
+  collection.stopCurrDownloads
+  gui.App.quit()
 
 
 checkDlFolder ->

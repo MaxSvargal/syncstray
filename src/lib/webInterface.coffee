@@ -5,7 +5,6 @@ module.exports = class WebInterface
     @subscribers = []
     @circleCounter = @circleCounterCounstructor().draw
     @registerDomEvents()
-
     @changeDlFolderLabel @params.dlPath
 
   subscribe: (method, callback) ->
@@ -19,6 +18,14 @@ module.exports = class WebInterface
 
   logout: =>
     subscriber.callback() for subscriber in @subscribers when subscriber.method is 'logout'
+
+  changeDlThreads: (event) =>
+    subscriber.callback(event.target.value) for subscriber in @subscribers when subscriber.method is 'changeDlThreads'
+
+  getUserData: (userData) ->
+    return if not userData
+    label = document.getElementById 'options_username_label'
+    label.innerHTML = userData.first_name + ' ' + userData.last_name
 
   registerDomEvents: (collection) ->
     document.addEventListener 'DOMContentLoaded', =>
@@ -34,7 +41,7 @@ module.exports = class WebInterface
       optionsOverlay = document.getElementById 'options'
 
       optionsBtn = document.getElementById 'do-options'
-      optionsBtn.addEventListener 'click', (ev) ->
+      optionsBtn.addEventListener 'click', (ev) =>
         ev.preventDefault()
         optionsOverlay.className = ''
 
@@ -46,10 +53,11 @@ module.exports = class WebInterface
       # Options
       btn_changeDir = document.getElementById 'option_change_folder'
       btn_logout = document.getElementById 'option_logout'
-      btn_threads = document.getElementById 'options_threads'
+      input_threads = document.getElementById 'options_threads'
       
       btn_changeDir.addEventListener 'click', @changeDlFolder
       btn_logout.addEventListener 'click', @logout
+      input_threads.addEventListener 'change', @changeDlThreads
 
   showMusicList: (collection) ->
     ul = document.getElementById 'music-list'
@@ -119,9 +127,9 @@ module.exports = class WebInterface
       @resetItemsStatus()
       @reloadCollectionDl folder
 
-  changeDlFolderLabel: (label) ->
-    label = document.getElementById 'option_change_folder_label'
-    label.innerHTML = label
+  changeDlFolderLabel: (folder) ->
+    label = document.getElementById 'options_change_folder_label'
+    label.innerHTML = folder
     
   setDoneStatus: ->
     syncBtn = document.getElementById 'do-sync'

@@ -53,6 +53,14 @@ module.exports = class Collection
       console.log "Music list cached."
       callback()
 
+  changeDlThreads: (threads) =>
+    console.log "THREADS CHANGED", threads
+    @params.dlThreads = parseInt threads
+    numForLoop = @params.dlThreads - @onProcess - 1
+    if numForLoop > 0
+      for [0..numForLoop]
+        @loopDlFn()
+
   getCachedCollection: (callback) ->
     @db.find {}, (err, collection) ->
       callback collection
@@ -61,7 +69,6 @@ module.exports = class Collection
     "#{data.artist} - #{data.title}.mp3"
 
   downloadTrack: (data, callback) =>
-    console.log 'start dl ', data.title
     filename = @_getFileName data
     file = fs.createWriteStream "#{@params.dlPath}/#{filename}", { flags: 'a' }
 
@@ -88,6 +95,8 @@ module.exports = class Collection
       console.log "Request problem:", err.message
 
   loopDlFn: ->
+    return if @params.dlThreads > @onProcess
+    
     track = @collectionDB[@collCurrPos++]
     currPerc = @collCurrPos * 100 / @collectionDB.length
     @circleCounter (currPerc).toFixed(1)

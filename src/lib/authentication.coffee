@@ -6,15 +6,19 @@ fs = require 'fs'
 module.exports = class Auth
   constructor: (@params) ->
     @userData = null
+    @subscribers = []
     return
+
+  subscribe: (method, callback) ->
+    @subscribers.push {'method': method, 'callback': callback}
 
   login: (callback) ->
     @getPermissions (code) =>
-      @getTokenFromServer code, (token) ->
+      @getTokenFromServer code, (token) =>
         callback "Getting token fail." if token.type is 'error' or token.error
         console.log "Get ready with token ", token
         @token = token
-        @getUserFromServer()
+        @getUserData()
         if typeof token is 'string'
           callback token
           return
@@ -73,11 +77,15 @@ module.exports = class Auth
       res.on 'data', (chunk) -> response += chunk
       res.on 'end', ->
         @userData = (JSON.parse response).response
-        callback @userData
+        callback @userData[0]
 
-  getUserData: (callback) ->
+  getUserData: ->
     if @userData is null
-      callback @getUserFromServer()
+      @getUserFromServer (userData) =>
+        for subscriber in @subscribers when subscriber.method is 'getUserData'
+          subscriber.callback(userData) 
+        return
     else
-      callback @userData
+      subscriber.callback(@userData) for subscriber in @subscribers when subscriber.method is 'getUserData'
+      return
         
