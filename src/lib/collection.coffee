@@ -103,10 +103,8 @@ module.exports = class Collection
     # Trim strings for corrective filename
     try
       filteredSymbols = [
-        [/\//g, '']
-        ['[', '']
-        [']', '']
         [/\s{2,}/g, ' ']
+        [/[><|"\?\*:\/\\]/g, '']
       ]
       for symbol in filteredSymbols
         track.artist = track.artist.replace symbol[0], symbol[1]
