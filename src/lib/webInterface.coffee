@@ -158,9 +158,9 @@ module.exports = class WebInterface
 
     imd = ctx.getImageData 0, 0, 60, 60
 
-    changeText = (percent) ->
-      text.innerHTML = percent + '%'
-      @setDoneStatus() if percent is 100
+    changeText = (percent) =>
+      text.innerHTML = if percent >= 100 then 'done' else percent + '%'
+      @setDoneStatus() if percent >= 100
         
     return {
       draw: (current) ->
