@@ -2,10 +2,11 @@ params =
   appID: '4138123'
   appSecret: '9c7G6T5bZkVE097J3AMI'
   dlPath: global.window.localStorage.getItem 'dlPath'
-  dlThreads: global.window.localStorage.getItem 'dlThreads' or 4
+  dlThreads: global.window.localStorage.getItem 'dlThreads'
   token: null
 
-#require 'coffee-trace'
+if params.dlThreads is null then params.dlThreads = 4
+
 gui = global.window.nwDispatcher.requireNwGui()
 #gui.Window.get().showDevTools()
 http =  require 'http'
