@@ -63,6 +63,7 @@ module.exports = class WebInterface
       input_threads.addEventListener 'change', @changeDlThreads
 
   showMusicList: (collection) ->
+    logo = document.getElementById 'main-logo-img'
     ul = document.getElementById 'music-list'
     frag = document.createDocumentFragment()
     for track in collection
@@ -82,6 +83,7 @@ module.exports = class WebInterface
       li.appendChild label
       frag.appendChild li
 
+    logo.className = 'hidden'
     ul.appendChild frag
     return
 

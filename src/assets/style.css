@@ -225,3 +225,15 @@ h1 > span {
     font-size: .9em;
     text-align: center;
   }
+
+#main-logo-img {
+  background: url('logo.png') center no-repeat;
+  width: 100%;
+  height: 356px;
+  margin: 2em auto;
+  line-height: 37em;
+  font-size: 1.3em;
+  text-align: center;
+  color: #42b29e;
+  font-weight: bold;
+}
