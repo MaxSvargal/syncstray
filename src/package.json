@@ -1,7 +1,7 @@
 {
   "name": "SyncStray",
   "description": "Utility to synchronize your music from vk.com with your computer.",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "dependencies": {
     "coffee-script": "~1.6.3",
     "nedb": "~0.9.4"
@@ -22,6 +22,7 @@
   "single-instance": true,
   "window": {
     "title": "SyncStray",
+    "icon": "assets/favicon.png",
     "width": 800,
     "height": 600,
     "position": "center",

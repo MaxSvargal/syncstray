@@ -4,6 +4,7 @@ module.exports = (grunt) ->
       options:
         build_dir: './builds'
         version: '0.8.4'
+        mac_icns: './src/assets/icon.icns'
         mac: true
         win: true
         linux32: true
