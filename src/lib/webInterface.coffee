@@ -7,6 +7,7 @@ module.exports = class WebInterface
     @registerDomEvents()
     @changeDlFolderLabel @params.dlPath
     @changeDlThreadsInput @params.dlThreads
+    @barsWidth = document.getElementById('music-list').offsetWidth
 
   subscribe: (method, callback) ->
     @subscribers.push {'method': method, 'callback': callback}
@@ -89,7 +90,7 @@ module.exports = class WebInterface
 
   scrollTo: (el) ->
     offset = el.offsetTop - window.innerHeight
-    document.body.scrollTop = offset
+    document.documentElement.scrollTop = offset
 
   setItemStatus: (status, id) ->
     elClass = 'music-list-item'
@@ -106,8 +107,8 @@ module.exports = class WebInterface
 
   setProgressBar: (id, percent) =>
     el = document.getElementById "music-list-item-bar_#{id}"
-    if not el then throw new Error "No element with id #{id}"
-    el.style.width = percent + '%'
+    if not el then console.error "No element with id #{id}"
+    el.style.width = @barsWidth * percent / 100 + 'px'
     if percent is 100 then @setItemStatus 'downloaded', id 
     if percent is 0 then @scrollTo el.parentNode.nextSibling
 
