@@ -37,7 +37,6 @@ module.exports = class Auth
       toolbar: false
     }
     childWindow.hide()
-
     childWindow.on 'loaded', ->
       hash = @window.location.hash
       code = hash.match /#code=(\w+)/, hash

@@ -23,13 +23,14 @@ module.exports = class Collection
 
   get: (callback) ->
     @getCollectionFromServer (dl_collection) =>
-      @saveCollection dl_collection, =>
-        @getCachedCollection (cached_collection) ->
-          callback cached_collection
+      # TODO: cache collection
+      #@saveCollection dl_collection, =>
+      #  @getCachedCollection (cached_collection) ->
+      callback dl_collection
 
   download: (path) ->
     if path then @params.dlPath = path
-    @getCachedCollection (collection) =>
+    @getCollectionFromServer (collection) =>
       if collection.length isnt 0
         @collectionDB = collection
         numForLoop = @params.dlThreads - @onProcess - 1
@@ -65,33 +66,40 @@ module.exports = class Collection
       callback collection
 
   _getFileName: (data) ->
-    "#{data.artist} - #{data.title}.mp3"
+    "#{data.artist} - #{data.title}.mp3"  
 
   downloadTrack: (data, callback) =>
     filename = @_getFileName data
-    file = fs.createWriteStream "#{@params.dlPath}/#{filename}", { flags: 'a' }
+    try
+      file = fs.createWriteStream "#{@params.dlPath}/#{filename}", { flags: 'a' }
+    catch
+      console.error "Error write file #{filename}. Ignoring."
+      callback() if @stopFlag is false 
+      return
 
-    req = http.get data.url, (res) =>
-      fsize = res.headers['content-length']
-      len = 0
-      @onProcess++
+    finally
+      req = http.get data.url, (res) =>
+        fsize = res.headers['content-length']
+        len = 0
+        @onProcess++
 
-      res.on 'data', (chunk) =>
-        file.write chunk
-        len += chunk.length
-        percent = Math.round len / fsize * 100
-        @setProgressBar data.aid, percent
+        res.on 'data', (chunk) =>
+          file.write chunk
+          len += chunk.length
+          percent = Math.round len / fsize * 100
+          @setProgressBar data.aid, percent
 
-      res.on 'error', (err) ->
-        console.log "Error with file '#{@params.dlPath}/#{filename}'. Aborted.", err
+        res.on 'error', (err) ->
+          console.log "Error with file '#{@params.dlPath}/#{filename}'. Aborted.", err
+          callback() if @stopFlag is false
 
-      res.on 'end', =>
-        file.end()
-        @onProcess--
-        callback() if @stopFlag is false
+        res.on 'end', =>
+          file.end()
+          @onProcess--
+          callback() if @stopFlag is false
 
-    req.on 'error', (err) ->
-      console.log "Request problem:", err.message
+      req.on 'error', (err) ->
+        console.log "Request problem:", err.message
 
   loopDlFn: ->
     return if @onProcess > @params.dlThreads - 1
@@ -114,14 +122,17 @@ module.exports = class Collection
       return
 
     filename = @_getFileName track
-    fs.exists "#{@params.dlPath}/#{filename}", (exists) =>
-      if exists
-        #console.log "#{track.artist} - #{track.title}.mp3" + ' already exists.'
-        @setItemStatus 'downloaded', track.aid
-        @loopDlFn()
-      else
-        @setItemStatus 'onprogress', track.aid
-        @downloadTrack track, => @loopDlFn()
+    try
+      fs.exists "#{@params.dlPath}/#{filename}", (exists) =>
+        if exists
+          #console.log "#{track.artist} - #{track.title}.mp3" + ' already exists.'
+          @setItemStatus 'downloaded', track.aid
+          @loopDlFn()
+        else
+          @setItemStatus 'onprogress', track.aid
+          @downloadTrack track, => @loopDlFn()
+    catch err
+      console.error err
 
   getCollectionFromServer: (callback) ->
     options = 

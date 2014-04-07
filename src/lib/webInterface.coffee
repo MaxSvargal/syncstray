@@ -95,6 +95,7 @@ module.exports = class WebInterface
   setItemStatus: (status, id) ->
     elClass = 'music-list-item'
     el = document.getElementById "#{elClass}_#{id}"
+    if not el then return
     el.className = elClass + ' ' + status
 
   resetItemsStatus: ->
@@ -107,7 +108,9 @@ module.exports = class WebInterface
 
   setProgressBar: (id, percent) =>
     el = document.getElementById "music-list-item-bar_#{id}"
-    if not el then console.error "No element with id #{id}"
+    if not el
+      console.error "No element with id #{id}"
+      return
     el.style.width = @barsWidth * percent / 100 + 'px'
     if percent is 100 then @setItemStatus 'downloaded', id 
     if percent is 0 then @scrollTo el.parentNode.nextSibling
