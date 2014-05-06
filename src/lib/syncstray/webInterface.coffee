@@ -1,7 +1,10 @@
 document = window.document
+log = window.console.log
+gui = global.window.nwDispatcher.requireNwGui()
 
 module.exports = class WebInterface
   constructor: (@observer, @params) ->
+    @initTray()
     @registerDomEvents()
     @changeDlFolderLabel @params.dlPath
     @changeDlThreadsInput @params.dlThreads
@@ -15,6 +18,7 @@ module.exports = class WebInterface
     @observer.subscribe 'callbackSearch', @callbackSearch
     @observer.subscribe 'getUserData', @getUserData
     @observer.subscribe 'toggleDownload', @onSyncCheckBtn
+    @observer.subscribe 'showMessage', @showMessage
 
   doSearch: (event) =>
     return if event.keyCode isnt 13
@@ -192,9 +196,41 @@ module.exports = class WebInterface
         changeText current
     }
 
-  showMessage: (title, body) ->
+  showMessage: ([title, body]) =>
     $title = @message.getElementsByClassName('message-box-title')[0]
     $body = @message.getElementsByClassName('message-box-body')[0]
     $title.innerHTML = title
     $body.innerHTML = body
+    @message.classList.remove 'hidden'
+
+
+  initTray: ->
+    tray = new gui.Tray
+      icon: 'assets/favicon.png'
+    menu = new gui.Menu
+
+    item_show = new gui.MenuItem
+      label: 'Show Program'
+
+    item_dl = new gui.MenuItem
+      type: 'checkbox'
+      checked: false
+      label: 'Disable download'
+
+    item_exit = new gui.MenuItem
+      label: 'Exit'
+
+    menu.append item_show
+    menu.append item_dl
+    menu.append item_exit
+    tray.menu = menu
+
+    item_exit.on 'click', -> gui.App.quit()
+    item_show.on 'click', -> win.show()
+    item_dl.on 'click', -> observer.publish 'toggleDownload'
+
+    @observer.subscribe 'toggleDownload', ->
+      item_dl.label = if item_dl.checked then 'Disable download' else 'Enable download'
+      item_dl.checked = if item_dl.checked then false else true
+
 

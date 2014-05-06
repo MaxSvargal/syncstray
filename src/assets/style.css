@@ -245,3 +245,57 @@ h1 > span {
   color: #42b29e;
   font-weight: bold;
 }
+
+.message-box {
+  width: 465px;
+  margin: auto;
+  height: 25%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: #fff;
+  border-bottom: 4px solid #42b29e;
+  padding: 2em;
+  -webkit-box-shadow: 0 0 0 1000px rgba(66, 178, 158, .8);
+  text-align: center;
+  z-index: 99;
+}
+
+.message-box-buttons {
+  margin-top: 2em;
+}
+
+.message-box-btn {
+  background: gray;
+  border: 2px solid gray;
+  color: #fff;
+  padding: .7em 1.5em;
+  font-size: 1em;
+  z-index: 21;
+}
+
+
+  .message-box-btn.main {
+    background: #FFC95C;
+    color: #a16e07;
+    border-color: #FFC95C;
+    margin-right: 1em;
+  }
+
+  .message-box-btn:hover {
+    border-color: #42b29e;
+    cursor: pointer;
+  }
+
+  .message-box-btn.main:hover {
+    border-color: #a16e07;
+  }
+
+
+.message-box-title {
+  font-weight: normal;
+  font-size: 1.6em;
+  margin: 0 0 1em 0;
+}
