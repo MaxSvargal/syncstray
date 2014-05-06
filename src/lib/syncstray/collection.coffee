@@ -18,6 +18,7 @@ module.exports = class Collection
     @collectionDB = []
 
     @observer.subscribe 'doSearch', @doSearch
+    @observer.subscribe 'toggleDownload', @toggleDownload
 
   get: (callback) ->
     @getCollectionFromServer (dl_collection) =>
@@ -158,7 +159,7 @@ module.exports = class Collection
     return if @onProcess is 0
     @stopFlag = true
     currPos = new Number @collCurrPos
-    for [0..params.dlThreads-1]
+    for [0..@params.dlThreads-1]
       filename = @_getFileName @collectionDB[--currPos]
       try
         fs.unlinkSync "#{params.dlPath}/#{filename}"

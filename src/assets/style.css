@@ -74,6 +74,14 @@ h1 > span {
   left: 8.2em;
 }
 
+#search_input {
+  font-size: 1.2em;
+  padding: .27em 1em;
+  margin-left: 40px;
+  border: none;
+  outline: none;
+}
+
 #counter {
   position: absolute;
   top: .5em;

@@ -6,12 +6,15 @@ module.exports = class WebInterface
     @changeDlFolderLabel @params.dlPath
     @changeDlThreadsInput @params.dlThreads
     @barsWidth = document.getElementById('music-list').offsetWidth
+    @syncBtn = document.getElementById 'do-sync'
+    @message = document.getElementById 'message-box'
 
     @observer.subscribe 'setProgressBar', @setProgressBar
     @observer.subscribe 'redrawCircleCounter', @circleCounter().draw
     @observer.subscribe 'setItemStatus', @setItemStatus
     @observer.subscribe 'callbackSearch', @callbackSearch
     @observer.subscribe 'getUserData', @getUserData
+    @observer.subscribe 'toggleDownload', @onSyncCheckBtn
 
   doSearch: (event) =>
     return if event.keyCode isnt 13
@@ -28,17 +31,18 @@ module.exports = class WebInterface
     label = document.getElementById 'options_username_label'
     label.innerHTML = userData.first_name + ' ' + userData.last_name
 
+  onSyncCheckBtn: (ev) =>
+    if @syncBtn.classList.contains 'stopped'
+      @syncBtn.className = 'rotate'
+    else
+      @syncBtn.className = 'stopped'
+
   registerDomEvents: (collection) ->
     document.addEventListener 'DOMContentLoaded', =>
-      syncBtn = document.getElementById 'do-sync'
-      syncBtn.addEventListener 'click', (ev) =>
+      @syncBtn.addEventListener 'click', (ev) =>
         ev.preventDefault()
-        @toggleDownload()
-        if syncBtn.classList.contains 'stopped'
-          syncBtn.className = 'rotate'
-        else
-          syncBtn.className = 'stopped'
-            
+        @observer.publish 'toggleDownload'
+
       optionsOverlay = document.getElementById 'options'
 
       optionsBtn = document.getElementById 'do-options'
@@ -135,7 +139,7 @@ module.exports = class WebInterface
     chooser.click()
 
   changeDlFolder: =>
-    @toggleDownload()
+    @observer.publish 'toggleDownload'
     @chooseFolderDialog (folder) =>
       @changeDlFolderLabel folder
       global.window.localStorage.setItem 'dlPath', folder
@@ -188,4 +192,9 @@ module.exports = class WebInterface
         changeText current
     }
 
+  showMessage: (title, body) ->
+    $title = @message.getElementsByClassName('message-box-title')[0]
+    $body = @message.getElementsByClassName('message-box-body')[0]
+    $title.innerHTML = title
+    $body.innerHTML = body
 
