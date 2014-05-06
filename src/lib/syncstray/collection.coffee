@@ -8,7 +8,7 @@ path = require 'path'
 Datastore = require 'nedb'
 
 module.exports = class Collection
-  constructor: (@params) ->
+  constructor: (@observer, @params) ->
     @db = new Datastore { filename: path.join(gui.App.dataPath, 'collection.db'), autoload: true }
     @db.ensureIndex { fieldName: 'aid', unique: true }
     #/Users/user/Library/Application Support/syncstray/collection.db
@@ -16,15 +16,13 @@ module.exports = class Collection
     @onProcess = 0
     @collCurrPos = 0
     @collectionDB = []
-    @subscribers = []
 
-  subscribe: (method, callback) ->
-    @subscribers.push {'method': method, 'callback': callback}
+    @observer.subscribe 'doSearch', @doSearch
 
   get: (callback) ->
     @getCollectionFromServer (dl_collection) =>
       # TODO: cache collection
-      #@saveCollection dl_collection, =>
+      @saveCollection dl_collection
       #  @getCachedCollection (cached_collection) ->
       callback dl_collection
 
@@ -39,22 +37,14 @@ module.exports = class Collection
       else
         @showNoTracks()
 
-  setItemStatus: (status, id) =>
-    subscriber.callback(status, id) for subscriber in @subscribers when subscriber.method is 'setItemStatus'
-
-  setProgressBar: (aid, percent) =>
-    subscriber.callback(aid, percent) for subscriber in @subscribers when subscriber.method is 'setProgressBar'
-
-  circleCounter: (percent) =>
-    subscriber.callback(percent) for subscriber in @subscribers when subscriber.method is 'circleCounter'
-
   saveCollection: (data, callback) ->
     @db.insert data, (err) ->
       if err then console.log err.message
       console.log "Music list cached."
-      callback()
+      callback() if callback
 
   changeDlThreads: (threads) =>
+    window.localStorage.setItem 'dlThreads', threads
     @params.dlThreads = threads
     numForLoop = @params.dlThreads - @onProcess - 1
     if numForLoop >= 0
@@ -87,7 +77,7 @@ module.exports = class Collection
           file.write chunk
           len += chunk.length
           percent = Math.round len / fsize * 100
-          @setProgressBar data.aid, percent
+          @observer.publish 'setProgressBar', [data.aid, percent]
 
         res.on 'error', (err) ->
           console.log "Error with file '#{@params.dlPath}/#{filename}'. Aborted.", err
@@ -106,7 +96,7 @@ module.exports = class Collection
 
     track = @collectionDB[@collCurrPos++]
     currPerc = @collCurrPos * 100 / @collectionDB.length
-    @circleCounter (currPerc).toFixed(1)
+    @observer.publish 'redrawCircleCounter', (currPerc).toFixed(1)
     return if not track
     # Trim strings for corrective filename
     try
@@ -118,7 +108,7 @@ module.exports = class Collection
         track.artist = track.artist.replace symbol[0], symbol[1]
         track.title = track.title.replace symbol[0], symbol[1]
     catch error
-      console.log error
+      console.error error
       return
 
     filename = @_getFileName track
@@ -126,10 +116,10 @@ module.exports = class Collection
       fs.exists "#{@params.dlPath}/#{filename}", (exists) =>
         if exists
           #console.log "#{track.artist} - #{track.title}.mp3" + ' already exists.'
-          @setItemStatus 'downloaded', track.aid
+          @observer.publish 'setItemStatus', ['downloaded', track.aid]
           @loopDlFn()
         else
-          @setItemStatus 'onprogress', track.aid
+          @observer.publish 'setItemStatus', ['onprogress', track.aid]
           @downloadTrack track, => @loopDlFn()
     catch err
       console.error err
@@ -178,3 +168,13 @@ module.exports = class Collection
   showNoTracks: ->
     console.log "no tracks =("
 
+  doSearch: (req) =>
+    regexp = new RegExp "[#{req}#{req.toUpperCase()}]{3,}.*$"
+    @collectionDB.forEach (track) ->  
+      s_artist = track.artist.search regexp
+      s_title = track.title.search regexp
+
+      if s_artist != -1 or s_title != -1
+        window.console.log 'op!', req, track
+        @observer.publish 'callbackSearch', [req, track.aid]
+        return

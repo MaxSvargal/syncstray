@@ -4,19 +4,22 @@ params =
   dlPath: global.window.localStorage.getItem 'dlPath'
   dlThreads: global.window.localStorage.getItem 'dlThreads'
   token: null
+  watch: true
 
 if params.dlThreads is null then params.dlThreads = 4
 
 gui = global.window.nwDispatcher.requireNwGui()
-#gui.Window.get().showDevTools()
+gui.Window.get().showDevTools()
 http =  require 'http'
-Webi = require './webinterface'
-Auth = require './authentication'
-Collection = require './collection'
+Webi = require './syncstray/webinterface'
+Auth = require './syncstray/authentication'
+Collection = require './syncstray/collection'
+Observer = require './syncstray/observer'
 
-auth = new Auth params
-webi = new Webi params
-collection = new Collection params
+observer = new Observer
+auth = new Auth observer, params
+webi = new Webi observer, params
+collection = new Collection observer, params
 
 checkVersion = ->
   siteurl = 'http://syncstray.maxsvargal.com/'
@@ -49,15 +52,6 @@ checkDlFolder = (callback) ->
     callback()
 
 initialize = ->
-  collection.subscribe 'setProgressBar', webi.setProgressBar
-  collection.subscribe 'circleCounter', webi.circleCounter
-  collection.subscribe 'setItemStatus', webi.setItemStatus
-  webi.subscribe 'toggleDownload', collection.toggleDownload
-  webi.subscribe 'reloadCollectionDl', collection.reloadCollectionDl
-  webi.subscribe 'logout', auth.logout
-  webi.subscribe 'changeDlThreads', collection.changeDlThreads
-  auth.subscribe 'getUserData', webi.getUserData
-
   auth.login (token) ->
     collection.params.token = token
     collection.get (data) ->
@@ -65,13 +59,11 @@ initialize = ->
       collection.download()
       return
 
-
 win = gui.Window.get()
 win.on 'close', ->
   @hide()
   collection.stopCurrDownloads
   gui.App.quit()
-
 
 checkDlFolder ->
   initialize()

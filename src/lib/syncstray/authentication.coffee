@@ -4,21 +4,16 @@ path = require 'path'
 fs = require 'fs'
 
 module.exports = class Auth
-  constructor: (@params) ->
-    @userData = null
-    @subscribers = []
+  constructor: (@observer, @params) ->
     return
-
-  subscribe: (method, callback) ->
-    @subscribers.push {'method': method, 'callback': callback}
 
   login: (callback) ->
     @getPermissions (code) =>
       @getTokenFromServer code, (token) =>
         callback "Getting token fail." if token.type is 'error' or token.error
         console.log "Get ready with token ", token
+        @getUser()
         @token = token
-        @getUserData()
         if typeof token is 'string'
           callback token
           return
@@ -64,27 +59,15 @@ module.exports = class Auth
         else
           callback { type: 'error', message: json.error }
 
-  getUserFromServer: (callback) ->
+  getUser: (callback) ->
     options = 
       host: 'api.vk.com'
       port: 443
       path: "/method/users.get?access_token=#{@token}"
 
-    https.get options, (res) ->
+    https.get options, (res) =>
       response = new String
       res.setEncoding 'utf8'
       res.on 'data', (chunk) -> response += chunk
-      res.on 'end', ->
-        @userData = (JSON.parse response).response
-        callback @userData[0]
-
-  getUserData: ->
-    if @userData is null
-      @getUserFromServer (userData) =>
-        for subscriber in @subscribers when subscriber.method is 'getUserData'
-          subscriber.callback(userData) 
-        return
-    else
-      subscriber.callback(@userData) for subscriber in @subscribers when subscriber.method is 'getUserData'
-      return
-        
+      res.on 'end', =>
+        @observer.publish 'getUserData', (JSON.parse response).response

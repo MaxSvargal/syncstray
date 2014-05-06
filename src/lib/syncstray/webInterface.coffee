@@ -1,30 +1,27 @@
 document = window.document
 
 module.exports = class WebInterface
-  constructor: (@params) ->
-    @subscribers = []
-    @circleCounter = @circleCounterCounstructor().draw
+  constructor: (@observer, @params) ->
     @registerDomEvents()
     @changeDlFolderLabel @params.dlPath
     @changeDlThreadsInput @params.dlThreads
     @barsWidth = document.getElementById('music-list').offsetWidth
 
-  subscribe: (method, callback) ->
-    @subscribers.push {'method': method, 'callback': callback}
+    @observer.subscribe 'setProgressBar', @setProgressBar
+    @observer.subscribe 'redrawCircleCounter', @circleCounter().draw
+    @observer.subscribe 'setItemStatus', @setItemStatus
+    @observer.subscribe 'callbackSearch', @callbackSearch
+    @observer.subscribe 'getUserData', @getUserData
 
-  toggleDownload: ->
-    subscriber.callback() for subscriber in @subscribers when subscriber.method is 'toggleDownload'
+  doSearch: (event) =>
+    return if event.keyCode isnt 13
+    req = event.target.value
+    @observer.publish 'doSearch', req
 
-  reloadCollectionDl: (folder) ->
-    subscriber.callback(folder) for subscriber in @subscribers when subscriber.method is 'reloadCollectionDl'
-
-  logout: =>
-    subscriber.callback() for subscriber in @subscribers when subscriber.method is 'logout'
-
-  changeDlThreads: (event) =>
-    threads = parseInt event.target.value
-    global.window.localStorage.setItem 'dlThreads', threads
-    subscriber.callback(threads) for subscriber in @subscribers when subscriber.method is 'changeDlThreads'
+  callbackSearch: ([req, id]) =>
+    elClass = 'music-list-item'
+    el = document.getElementById "#{elClass}_#{id}"
+    @scrollTo el
 
   getUserData: (userData) ->
     return if not userData
@@ -58,10 +55,14 @@ module.exports = class WebInterface
       btn_changeDir = document.getElementById 'option_change_folder'
       btn_logout = document.getElementById 'option_logout'
       input_threads = document.getElementById 'options_threads'
+      disable_scroll = document.getElementById 'option_disable_scroll'
+      search_input = document.getElementById 'search_input'
       
       btn_changeDir.addEventListener 'click', @changeDlFolder
       btn_logout.addEventListener 'click', @logout
       input_threads.addEventListener 'change', @changeDlThreads
+      disable_scroll.addEventListener 'click', @toggleScrollWatcher
+      search_input.addEventListener 'keyup', @doSearch
 
   showMusicList: (collection) ->
     logo = document.getElementById 'main-logo-img'
@@ -76,11 +77,15 @@ module.exports = class WebInterface
       bar.className = 'music-list-item-bar'
       bar.id = "music-list-item-bar_#{track.aid}"
 
+      checkbox = document.createElement 'checkbox'
+      checkbox.className = 'music-list-item-checkbox'
+
       label = document.createElement 'label'
       label.className = 'music-list-item-label'
       label.innerHTML = "#{track.artist} - #{track.title}"
 
       li.appendChild bar
+      li.appendChild checkbox
       li.appendChild label
       frag.appendChild li
 
@@ -89,10 +94,11 @@ module.exports = class WebInterface
     return
 
   scrollTo: (el) ->
+    return false if not el
     offset = el.offsetTop - window.innerHeight
     document.documentElement.scrollTop = offset
 
-  setItemStatus: (status, id) ->
+  setItemStatus: ([status, id]) ->
     elClass = 'music-list-item'
     el = document.getElementById "#{elClass}_#{id}"
     if not el then return
@@ -106,14 +112,14 @@ module.exports = class WebInterface
     for bar in bars
       bar.style.width = 0
 
-  setProgressBar: (id, percent) =>
+  setProgressBar: ([id, percent]) =>
     el = document.getElementById "music-list-item-bar_#{id}"
     if not el
       console.error "No element with id #{id}"
       return
     el.style.width = @barsWidth * percent / 100 + 'px'
-    if percent is 100 then @setItemStatus 'downloaded', id 
-    if percent is 0 then @scrollTo el.parentNode.nextSibling
+    if percent is 100 then @setItemStatus ['downloaded', id]
+    if percent is 0 and @params.watch is true then @scrollTo el.parentNode.nextSibling
 
   showNoTracks: ->
     ul = document.getElementById 'music-list'
@@ -143,12 +149,17 @@ module.exports = class WebInterface
   changeDlThreadsInput: (threads) ->
     input = document.getElementById 'options_threads'
     input.value = threads
+
+  toggleScrollWatcher: (e) =>
+    e.preventDefault()
+    status = e.target.parentNode.classList.toggle 'checked'
+    @params.watch = if status is true then false else true
     
   setDoneStatus: ->
     syncBtn = document.getElementById 'do-sync'
     syncBtn.className = 'stopped'
 
-  circleCounterCounstructor: =>
+  circleCounter: =>
     text = global.window.document.getElementById 'counter-label'
     canvas = global.window.document.getElementById 'counter'
     ctx = canvas.getContext '2d'
@@ -176,3 +187,5 @@ module.exports = class WebInterface
         ctx.stroke()
         changeText current
     }
+
+

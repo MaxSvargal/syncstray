@@ -8,8 +8,8 @@
   <body>
     <header id="header">
       <a href="#" id="do-sync" class="rotate">sync</a>
-      <!-- <a href="#" id="do-watch">watch</a> -->
       <a href="#" id="do-options"></a>
+      <!-- <input id="search_input" type="text"> -->
       <canvas id="counter" width="60" height="60"></canvas>
       <div id="counter-label"></div>
       <h1>Sync<span>Stray</span></h1>
@@ -29,6 +29,12 @@
       <div class="options-item">
         <input class="options-item-input" id="options_threads" type="text" value="4" maxlength="2" min="1">
         <div class="options-item-input-label">Number of download threads</div>
+      </div>
+      <div class="options-item">
+        <a href="#" id="option_disable_scroll" class="options-item-checkbox">
+          <div class="options-item-checkbox-icon"></div>
+          <div class="options-item-input-label">Disable scroll on download</div>
+        </a>
       </div>
       <!--
       <div class="options-item">
