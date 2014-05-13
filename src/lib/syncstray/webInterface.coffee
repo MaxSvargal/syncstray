@@ -127,7 +127,7 @@ module.exports = class WebInterface
   scrollTo: (el) ->
     return false if not el
     $box = document.getElementById 'music-list'
-    $box.scrollTop = el.offsetTop - $box.clientHeight + 75
+    $box.scrollTop = el.offsetTop - $box.clientHeight
 
   setItemStatus: ([status, id]) ->
     elClass = 'music-list-item'

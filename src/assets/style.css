@@ -2,7 +2,7 @@
 html, body {
   background: #eaeaea;
   margin: 0;
-  height: 100%
+  height: 100%;
   -webkit-font-smoothing: antialiased;
   font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", 
     Helvetica, Arial, "Lucida Grande", sans-serif;
@@ -11,7 +11,6 @@ html, body {
 header {
   background: #42b29e;
   padding: 1em;
-  position: fixed;
   z-index: 10;
   width: 100%;
   box-sizing: border-box;
@@ -30,6 +29,13 @@ h1 > span {
 
 .hidden {
   display: none;
+}
+
+.content {
+  height: 100%;
+  padding-top: 76px;
+  margin-top: -76px;
+  box-sizing: border-box;
 }
 
 #do-sync {
@@ -78,7 +84,7 @@ h1 > span {
 
 #search_input {
   font-size: 1.2em;
-  padding: .27em 1em;
+  padding: .27em .5em;
   margin-left: 40px;
   border: none;
   outline: none;
@@ -103,17 +109,12 @@ h1 > span {
   font-size: .7em;
 }
 
-.wrap {
-  padding-top: 76px;
-}
-
 #music-list, 
 #search-list {
   margin: 0;
   padding: 0;
   overflow-y: scroll;
   width: 100%;
-  position: fixed;
   height: 100%;
 }
 
@@ -245,7 +246,12 @@ h1 > span {
   background: url('logo.png') center no-repeat;
   width: 100%;
   height: 356px;
-  margin: 2em auto;
+  margin: auto;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   line-height: 37em;
   font-size: 1.3em;
   text-align: center;
@@ -309,7 +315,6 @@ h1 > span {
 }
 
 #search-list {
-  position: fixed;
   top: 76px;
   background: #fff;
   margin-left: 50%;
