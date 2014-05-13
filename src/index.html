@@ -53,18 +53,19 @@
       <a href="#" class="bnt-close-options" id="do-options-close">Done</a>
     </div>
 
-    <div id="message-box" class="message-box">
+    <div id="message-box" class="message-box hidden">
       <h3 class="message-box-title">New version available!</h3>
       <div class="message-box-body">We can download and install updates now.</div>
       <div class="message-box-buttons">
-        <button class="message-box-btn main">Update now</button>
-        <button class="message-box-btn">Cancel</button>
+        <button class="message-box-btn main" id="message-ok-btn">Update now</button>
+        <button class="message-box-btn" id="message-cancel-btn">Cancel</button>
       </div>
     </div>
 
     <div class="wrap">
       <div id="main-logo-img">One moment please...</div>
       <ul id="music-list"></ul>
+      <ul id="search-list" class="hidden"></ul>
     </div>
     <input type="file" id="choose-folder" nwdirectory />
     <script>

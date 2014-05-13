@@ -23,12 +23,32 @@ module.exports = class WebInterface
   doSearch: (event) =>
     return if event.keyCode isnt 13
     req = event.target.value
-    @observer.publish 'doSearch', req
+    @observer.publish 'doSearch', [req]
 
-  callbackSearch: ([req, id]) =>
-    elClass = 'music-list-item'
-    el = document.getElementById "#{elClass}_#{id}"
-    @scrollTo el
+  callbackSearch: ([results]) =>
+    s_ul = document.getElementById 'search-list'
+    s_ul.innerHTML = ''
+
+    win_box = document.createElement 'div'
+    win_box.className = 'search-list-info'
+    win_box_label = document.createElement 'div'
+    win_box_label.className = 'search-list-label'
+    win_box_label.innerHTML = "Найдено #{results.length} композиций"
+    win_box_close = document.createElement 'a'
+    win_box_close.href = '#'
+    win_box_close.innerHTML = 'Закрыть'
+    win_box_close.className = 'search-list-close'
+
+    win_box.appendChild win_box_label
+    win_box.appendChild win_box_close
+    s_ul.appendChild win_box
+    
+    frag = @genListFragment results
+    s_ul.appendChild frag
+    s_ul.classList.remove 'hidden'
+
+    #m_ul = document.getElementById 'music-list'
+    #m_ul.classList.add 'hidden'
 
   getUserData: (userData) ->
     return if not userData
@@ -72,9 +92,7 @@ module.exports = class WebInterface
       disable_scroll.addEventListener 'click', @toggleScrollWatcher
       search_input.addEventListener 'keyup', @doSearch
 
-  showMusicList: (collection) ->
-    logo = document.getElementById 'main-logo-img'
-    ul = document.getElementById 'music-list'
+  genListFragment: (collection) ->
     frag = document.createDocumentFragment()
     for track in collection
       li = document.createElement 'li'
@@ -96,15 +114,20 @@ module.exports = class WebInterface
       li.appendChild checkbox
       li.appendChild label
       frag.appendChild li
+    return frag
 
+  showMusicList: (collection) ->
+    logo = document.getElementById 'main-logo-img'
     logo.className = 'hidden'
+    ul = document.getElementById 'music-list'
+    frag = @genListFragment collection
     ul.appendChild frag
     return
 
   scrollTo: (el) ->
     return false if not el
-    offset = el.offsetTop - window.innerHeight
-    document.documentElement.scrollTop = offset
+    $box = document.getElementById 'music-list'
+    $box.scrollTop = el.offsetTop - $box.clientHeight + 75
 
   setItemStatus: ([status, id]) ->
     elClass = 'music-list-item'
@@ -199,8 +222,19 @@ module.exports = class WebInterface
   showMessage: ([title, body]) =>
     $title = @message.getElementsByClassName('message-box-title')[0]
     $body = @message.getElementsByClassName('message-box-body')[0]
+    $ok_btn = document.getElementById 'message-ok-btn'
+    $cancel_btn = document.getElementById 'message-cancel-btn'
     $title.innerHTML = title
     $body.innerHTML = body
+
+    $ok_btn.addEventListener 'click', (e) =>
+      e.preventDefault()
+      @observer.publish 'goUpdate'
+
+    $cancel_btn.addEventListener 'click', (e) =>
+      e.preventDefault()
+      @message.classList.add 'hidden'
+
     @message.classList.remove 'hidden'
 
 

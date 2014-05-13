@@ -19,6 +19,7 @@ module.exports = class Collection
 
     @observer.subscribe 'doSearch', @doSearch
     @observer.subscribe 'toggleDownload', @toggleDownload
+    @observer.subscribe 'stopDownload', @stopCurrDownloads
 
   get: (callback) ->
     @getCollectionFromServer (dl_collection) =>
@@ -169,13 +170,14 @@ module.exports = class Collection
   showNoTracks: ->
     console.log "no tracks =("
 
-  doSearch: (req) =>
-    regexp = new RegExp "[#{req}#{req.toUpperCase()}]{3,}.*$"
-    @collectionDB.forEach (track) ->  
+  doSearch: ([req]) =>
+    results = []
+    regexp = new RegExp "(?=#{req}){3,}.*$", 'i'
+    @collectionDB.forEach (track) =>
       s_artist = track.artist.search regexp
       s_title = track.title.search regexp
 
       if s_artist != -1 or s_title != -1
-        window.console.log 'op!', req, track
-        @observer.publish 'callbackSearch', [req, track.aid]
-        return
+        results.push track
+        
+    @observer.publish 'callbackSearch', [results]

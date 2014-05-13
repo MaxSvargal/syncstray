@@ -1,6 +1,8 @@
-body {
+
+html, body {
   background: #eaeaea;
   margin: 0;
+  height: 100%
   -webkit-font-smoothing: antialiased;
   font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", 
     Helvetica, Arial, "Lucida Grande", sans-serif;
@@ -105,9 +107,14 @@ h1 > span {
   padding-top: 76px;
 }
 
-#music-list {
+#music-list, 
+#search-list {
   margin: 0;
   padding: 0;
+  overflow-y: scroll;
+  width: 100%;
+  position: fixed;
+  height: 100%;
 }
 
 .music-list-item {
@@ -261,10 +268,11 @@ h1 > span {
   -webkit-box-shadow: 0 0 0 1000px rgba(66, 178, 158, .8);
   text-align: center;
   z-index: 99;
+  line-height: 1.4em;
 }
 
 .message-box-buttons {
-  margin-top: 2em;
+  margin-top: 1em;
 }
 
 .message-box-btn {
@@ -299,3 +307,30 @@ h1 > span {
   font-size: 1.6em;
   margin: 0 0 1em 0;
 }
+
+#search-list {
+  position: fixed;
+  top: 76px;
+  background: #fff;
+  margin-left: 50%;
+}
+
+  #search-list .music-list-item:first-child {
+    margin-top: 40px;
+  }
+
+  .search-list-info {
+    position: fixed;
+    z-index: 1;
+    width: 100%;
+    height: 32px;
+    background: red;
+  }
+
+  .search-list-label {
+
+  }
+
+  .search-list-close {
+    
+  }

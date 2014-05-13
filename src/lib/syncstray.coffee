@@ -39,12 +39,11 @@ initialize = ->
       webi.showMusicList data
       collection.download()
       return
-
+###
 win.on 'close', -> 
+  observer.publish 'stopDownload'
   @hide()
   @setShowInTaskbar false
-
+###
 # Start app here
-checkDlFolder ->
-  initialize()
-  updater.checkVersion()
+checkDlFolder -> initialize()
