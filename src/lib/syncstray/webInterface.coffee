@@ -127,7 +127,7 @@ module.exports = class WebInterface
   scrollTo: (el) ->
     return false if not el
     $box = document.getElementById 'music-list'
-    $box.scrollTop = el.offsetTop - $box.clientHeight
+    $box.scrollTop = el.offsetTop - $box.clientHeight + 75
 
   setItemStatus: ([status, id]) ->
     elClass = 'music-list-item'
@@ -171,7 +171,7 @@ module.exports = class WebInterface
       @changeDlFolderLabel folder
       global.window.localStorage.setItem 'dlPath', folder
       @resetItemsStatus()
-      @reloadCollectionDl folder
+      @observer.publish 'reloadCollectionDl', [folder]
 
   changeDlFolderLabel: (folder) ->
     label = document.getElementById 'options_change_folder_label'

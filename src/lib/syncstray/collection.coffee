@@ -20,6 +20,7 @@ module.exports = class Collection
     @observer.subscribe 'doSearch', @doSearch
     @observer.subscribe 'toggleDownload', @toggleDownload
     @observer.subscribe 'stopDownload', @stopCurrDownloads
+    @observer.subscribe 'reloadCollectionDl', @reloadCollectionDl
 
   get: (callback) ->
     @getCollectionFromServer (dl_collection) =>
