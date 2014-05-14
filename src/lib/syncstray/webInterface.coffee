@@ -33,11 +33,14 @@ module.exports = class WebInterface
     win_box.className = 'search-list-info'
     win_box_label = document.createElement 'div'
     win_box_label.className = 'search-list-label'
-    win_box_label.innerHTML = "Найдено #{results.length} композиций"
+    win_box_label.innerHTML = "Finded #{results.length} tracks"
     win_box_close = document.createElement 'a'
     win_box_close.href = '#'
-    win_box_close.innerHTML = 'Закрыть'
+    win_box_close.innerHTML = 'Close'
     win_box_close.className = 'search-list-close'
+    win_box_close.addEventListener 'click', (e) ->
+      e.preventDefault()
+      s_ul.classList.add 'hidden'
 
     win_box.appendChild win_box_label
     win_box.appendChild win_box_close
@@ -46,9 +49,6 @@ module.exports = class WebInterface
     frag = @genListFragment results
     s_ul.appendChild frag
     s_ul.classList.remove 'hidden'
-
-    #m_ul = document.getElementById 'music-list'
-    #m_ul.classList.add 'hidden'
 
   getUserData: (userData) ->
     return if not userData
@@ -103,8 +103,11 @@ module.exports = class WebInterface
       bar.className = 'music-list-item-bar'
       bar.id = "music-list-item-bar_#{track.aid}"
 
-      checkbox = document.createElement 'checkbox'
+      checkbox = document.createElement 'a'
       checkbox.className = 'music-list-item-checkbox'
+      checkbox.href = '#'
+      checkbox.setAttribute 'data-id', track.aid
+      checkbox.addEventListener 'click', @checkboxClickHandle
 
       label = document.createElement 'label'
       label.className = 'music-list-item-label'
@@ -115,6 +118,13 @@ module.exports = class WebInterface
       li.appendChild label
       frag.appendChild li
     return frag
+
+  checkboxClickHandle: (e) =>
+    e.preventDefault()
+    $el = e.target
+    $el.classList.toggle 'checked'
+    if $el.classList.contains 'checked'
+      @observer.publish 'downloadTrack', [$el.getAttribute('data-id')]
 
   showMusicList: (collection) ->
     logo = document.getElementById 'main-logo-img'

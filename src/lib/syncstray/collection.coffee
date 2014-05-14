@@ -21,6 +21,7 @@ module.exports = class Collection
     @observer.subscribe 'toggleDownload', @toggleDownload
     @observer.subscribe 'stopDownload', @stopCurrDownloads
     @observer.subscribe 'reloadCollectionDl', @reloadCollectionDl
+    @observer.subscribe 'downloadTrack', @downloadSingleTrack
 
   get: (callback) ->
     @getCollectionFromServer (dl_collection) =>
@@ -30,6 +31,7 @@ module.exports = class Collection
       callback dl_collection
 
   download: (path) ->
+    window.console.log 'DL!', path
     if path then @params.dlPath = path
     @getCollectionFromServer (collection) =>
       if collection.length isnt 0
@@ -182,3 +184,10 @@ module.exports = class Collection
         results.push track
         
     @observer.publish 'callbackSearch', [results]
+
+  downloadSingleTrack: (id) =>
+    for track in @collectionDB
+      if track.aid is parseInt id
+        @downloadTrack track, -> null
+        return
+
