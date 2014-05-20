@@ -160,6 +160,16 @@ h1 > span {
     border: 2px solid #fff;
   }
 
+.music-list-item-checkbox-all {
+  position: fixed;
+  background: #5a6968;
+  color: #fff;
+  z-index: 1;
+  right: 1em;
+  padding: .3em .5em;
+  text-decoration: none;
+}
+
 .music-list-item-label {
   color: #8e8e8e;
   padding: .5em 2em;

@@ -22,36 +22,35 @@ module.exports = class Collection
     @observer.subscribe 'stopDownload', @stopCurrDownloads
     @observer.subscribe 'reloadCollectionDl', @reloadCollectionDl
     @observer.subscribe 'downloadTrack', @downloadSingleTrack
+    @observer.subscribe 'changeDlThreads', @changeDlThreads
 
   get: (callback) ->
     @getCollectionFromServer (dl_collection) =>
-      # TODO: cache collection
       @saveCollection dl_collection
-      #  @getCachedCollection (cached_collection) ->
       callback dl_collection
 
   download: (path) ->
-    window.console.log 'DL!', path
     if path then @params.dlPath = path
-    @getCollectionFromServer (collection) =>
-      if collection.length isnt 0
-        @collectionDB = collection
-        numForLoop = @params.dlThreads - @onProcess - 1
-        for [0..numForLoop]
-          @loopDlFn()
-      else
-        @showNoTracks()
+    numForLoop = @params.dlThreads - @onProcess - 1
+    window.console.log 'download...', @params, numForLoop
+    for [0..numForLoop]
+      @loopDlFn()
 
-  saveCollection: (data, callback) ->
+  saveCollection: (data) ->
+    @collectionDB = data
+    @showNoTracks() if data.length is 0
+    ###
     @db.insert data, (err) ->
       if err then console.log err.message
       console.log "Music list cached."
       callback() if callback
+    ###
 
-  changeDlThreads: (threads) =>
+  changeDlThreads: ([threads]) =>
     window.localStorage.setItem 'dlThreads', threads
     @params.dlThreads = threads
     numForLoop = @params.dlThreads - @onProcess - 1
+    window.console.log 'reload dl with', threads, 'threads'
     if numForLoop >= 0
       for [0..numForLoop]
         @loopDlFn()

@@ -92,8 +92,19 @@ module.exports = class WebInterface
       disable_scroll.addEventListener 'click', @toggleScrollWatcher
       search_input.addEventListener 'keyup', @doSearch
 
+  genAllCheckboxSelector: ->
+    allCheckbox = document.createElement 'a'
+    allCheckbox.className = 'music-list-item-checkbox-all'
+    allCheckbox.href = '#'
+    allCheckbox.innerHTML = 'Select all'
+    allCheckbox.addEventListener 'click', @checkAllHandle
+    return allCheckbox
+
   genListFragment: (collection) ->
     frag = document.createDocumentFragment()
+    allCheckbox = @genAllCheckboxSelector()
+    frag.appendChild allCheckbox
+
     for track in collection
       li = document.createElement 'li'
       li.className = 'music-list-item'
@@ -118,6 +129,11 @@ module.exports = class WebInterface
       li.appendChild label
       frag.appendChild li
     return frag
+
+  checkAllHandle: (e) =>
+    e.preventDefault()
+    els = document.getElementsByClassName 'music-list-item-checkbox'
+    el.classList.add 'checked' for el in els
 
   checkboxClickHandle: (e) =>
     e.preventDefault()
@@ -182,6 +198,9 @@ module.exports = class WebInterface
       global.window.localStorage.setItem 'dlPath', folder
       @resetItemsStatus()
       @observer.publish 'reloadCollectionDl', [folder]
+
+  changeDlThreads: (e) =>
+     @observer.publish 'changeDlThreads', [e.target.value]
 
   changeDlFolderLabel: (folder) ->
     label = document.getElementById 'options_change_folder_label'
