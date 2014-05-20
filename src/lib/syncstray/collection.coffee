@@ -32,25 +32,17 @@ module.exports = class Collection
   download: (path) ->
     if path then @params.dlPath = path
     numForLoop = @params.dlThreads - @onProcess - 1
-    window.console.log 'download...', @params, numForLoop
     for [0..numForLoop]
       @loopDlFn()
 
   saveCollection: (data) ->
     @collectionDB = data
     @showNoTracks() if data.length is 0
-    ###
-    @db.insert data, (err) ->
-      if err then console.log err.message
-      console.log "Music list cached."
-      callback() if callback
-    ###
 
   changeDlThreads: ([threads]) =>
     window.localStorage.setItem 'dlThreads', threads
     @params.dlThreads = threads
     numForLoop = @params.dlThreads - @onProcess - 1
-    window.console.log 'reload dl with', threads, 'threads'
     if numForLoop >= 0
       for [0..numForLoop]
         @loopDlFn()

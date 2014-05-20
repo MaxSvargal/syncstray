@@ -1,7 +1,7 @@
 'use strict'
 
 ######
-#  CoffeeScript Presener (Publish/Subscribe) pattern realization
+#  CoffeeScript Presenter (Publish/Subscribe) pattern realization
 #  By MaxSvargal <maxsvargal@gmail.com>
 #  http://github.com/maxsvargal
 #  License: MIT
