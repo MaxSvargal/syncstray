@@ -24,11 +24,15 @@ collection = new Collection observer, params
 
 checkDlFolder = (callback) ->
   if not params.dlPath
-    global.window.alert 'Please, select folder for download.'
-    webi.chooseFolderDialog (folder) ->
-      params.dlPath = folder
-      global.window.localStorage.setItem 'dlPath', folder
-      callback()
+    observer.publish 'showMessage',
+      title: 'Please, select folder'
+      body: 'for download your music.'
+      okBtnLabel: 'Select'
+      onOkBtnClick: ->
+        webi.chooseFolderDialog (folder) ->
+          params.dlPath = folder
+          global.window.localStorage.setItem 'dlPath', folder
+          callback()
   else
     callback()
 
@@ -46,4 +50,6 @@ win.on 'close', ->
   @setShowInTaskbar false
 
 # Start app here
-checkDlFolder -> initialize()
+checkDlFolder -> 
+  updater.check()
+  initialize()

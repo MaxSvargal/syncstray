@@ -4,7 +4,8 @@
   "version": "0.3.0",
   "dependencies": {
     "coffee-script": "~1.7.1",
-    "nedb": "~0.10.5"
+    "nedb": "~0.10.5",
+    "adm-zip": "~0.4.4"
   },
   "repository": {
     "type": "git",

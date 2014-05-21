@@ -5,12 +5,12 @@ gui = global.window.nwDispatcher.requireNwGui()
 module.exports = class WebInterface
   constructor: (@observer, @params) ->
     @initTray()
+    @initMessage()
     @registerDomEvents()
     @changeDlFolderLabel @params.dlPath
     @changeDlThreadsInput @params.dlThreads
     @barsWidth = document.getElementById('music-list').offsetWidth
     @syncBtn = document.getElementById 'do-sync'
-    @message = document.getElementById 'message-box'
 
     @observer.subscribe 'setProgressBar', @setProgressBar
     @observer.subscribe 'redrawCircleCounter', @circleCounter().draw
@@ -248,24 +248,29 @@ module.exports = class WebInterface
         changeText current
     }
 
-  showMessage: ([title, body]) =>
-    $title = @message.getElementsByClassName('message-box-title')[0]
-    $body = @message.getElementsByClassName('message-box-body')[0]
-    $ok_btn = document.getElementById 'message-ok-btn'
-    $cancel_btn = document.getElementById 'message-cancel-btn'
-    $title.innerHTML = title
-    $body.innerHTML = body
+  initMessage: ->
+    @$message = document.getElementById 'message-box'
+    @$message_title = @$message.getElementsByClassName('message-box-title')[0]
+    @$message_body = @$message.getElementsByClassName('message-box-body')[0]
+    @$message_ok_btn = document.getElementById 'message-ok-btn'
+    @$message_cancel_btn = document.getElementById 'message-cancel-btn'
 
-    $ok_btn.addEventListener 'click', (e) =>
+    @$message_ok_btn.addEventListener 'click', (e) =>
       e.preventDefault()
-      @observer.publish 'goUpdate'
+      @$message.classList.add 'hidden'
 
-    $cancel_btn.addEventListener 'click', (e) =>
+    @$message_cancel_btn.addEventListener 'click', (e) =>
       e.preventDefault()
-      @message.classList.add 'hidden'
+      @$message.classList.add 'hidden'
 
-    @message.classList.remove 'hidden'
+  showMessage: (params) =>
+    @$message_title.innerHTML = params.title if params.title
+    @$message_body.innerHTML = params.body if params.body
+    @$message_ok_btn.innerHTML = params.okBtnLabel if params.okBtnLabel
 
+    @$message.classList.remove 'hidden'
+    @$message_ok_btn.addEventListener 'click', =>
+      params.onOkBtnClick() if params.onOkBtnClick
 
   initTray: ->
     tray = new gui.Tray
