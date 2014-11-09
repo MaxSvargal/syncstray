@@ -61,7 +61,7 @@ module.exports = class WebInterface
     else
       @syncBtn.className = 'stopped'
 
-  registerDomEvents: (collection) ->
+  registerDomEvents: (collection) =>
     document.addEventListener 'DOMContentLoaded', =>
       @syncBtn.addEventListener 'click', (ev) =>
         ev.preventDefault()
@@ -272,6 +272,10 @@ module.exports = class WebInterface
     @$message_ok_btn.addEventListener 'click', =>
       params.onOkBtnClick() if params.onOkBtnClick
 
+  logout: =>
+    global.console.log @observer
+    @observer.publish 'logout'
+
   initTray: ->
     tray = new gui.Tray
       icon: 'assets/favicon.png'
@@ -294,8 +298,10 @@ module.exports = class WebInterface
     tray.menu = menu
 
     item_exit.on 'click', -> gui.App.quit()
-    item_show.on 'click', -> win.show()
-    item_dl.on 'click', -> observer.publish 'toggleDownload'
+    item_show.on 'click', -> 
+      win = gui.Window.get()
+      win.show()
+    item_dl.on 'click', => @observer.publish 'toggleDownload'
 
     @observer.subscribe 'toggleDownload', ->
       item_dl.label = if item_dl.checked then 'Disable download' else 'Enable download'

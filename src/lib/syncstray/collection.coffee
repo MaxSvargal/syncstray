@@ -58,6 +58,9 @@ module.exports = class Collection
     filename = @_getFileName data
     try
       file = fs.createWriteStream "#{@params.dlPath}/#{filename}", { flags: 'a' }
+      file.on 'error', (e) ->
+        console.log e
+        callback() if @stopFlag is false
     catch
       console.error "Error write file #{filename}. Ignoring."
       callback() if @stopFlag is false 

@@ -3,7 +3,6 @@ html, body {
   background: #eaeaea;
   margin: 0;
   height: 100%;
-  -webkit-font-smoothing: antialiased;
   font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", 
     Helvetica, Arial, "Lucida Grande", sans-serif;
 }
@@ -342,6 +341,7 @@ h1 > span {
 #search-list {
   position: fixed;
   top: 76px;
+  height: 87%;
   background: #fff;
   margin-left: 50%;
   box-shadow: 0 0 30px 10px #fff;

@@ -3,7 +3,7 @@
   "description": "Utility to synchronize your music from vk.com with your computer.",
   "version": "0.3.0",
   "dependencies": {
-    "coffee-script": "~1.7.1",
+    "coffee-script": "~1.8.0",
     "nedb": "~0.10.5",
     "adm-zip": "~0.4.4"
   },

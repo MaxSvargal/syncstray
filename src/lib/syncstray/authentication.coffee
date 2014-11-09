@@ -5,6 +5,7 @@ fs = require 'fs'
 
 module.exports = class Auth
   constructor: (@observer, @params) ->
+    @observer.subscribe 'logout', @logout
     return
 
   login: (callback) ->
