@@ -1,10 +1,11 @@
 import { combineReducers } from 'redux'
 import { routerReducer as routing } from 'react-router-redux'
 import { code, token } from './auth'
-import { audio, workers, queue } from './audio'
+import { audio, workers, queue, dlState } from './audio'
+import { dlpath } from './dlfolder'
 
 const rootReducer = combineReducers({
-  routing, code, token, audio, workers, queue
+  routing, code, token, audio, workers, queue, dlpath, dlState
 })
 
 export default rootReducer
