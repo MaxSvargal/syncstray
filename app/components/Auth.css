@@ -1,0 +1,12 @@
+.container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vkview {
+  width: 656px;
+  height: 377px;
+}

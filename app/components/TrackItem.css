@@ -1,0 +1,12 @@
+.container {
+  position: relative;
+  padding: .5rem;
+}
+
+.bar {
+   height: 20px;
+   background: blue;
+   z-index: -1;
+   transition: width .6s;
+   position: absolute;
+}
