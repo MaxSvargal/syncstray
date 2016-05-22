@@ -32,8 +32,8 @@ export default class Audio extends Component {
   }
 
   render() {
-    const { workers, audio, scrolled } = this.props
-    const { startDownload, pauseDownload, triggerScroll } = this.props
+    const { workers, audio } = this.props
+    const { startDownload, pauseDownload } = this.props
     return (
       <div>
         <Link to="/">Go home</Link>
