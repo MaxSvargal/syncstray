@@ -1,12 +1,20 @@
 .container {
   position: relative;
-  padding: .5rem;
+  padding: .8rem 1rem;
 }
 
 .bar {
-   height: 20px;
-   background: blue;
-   z-index: -1;
+   height: 3rem;
+   z-index: 1;
+   top: 0;
+   left: 0;
    transition: width .6s;
    position: absolute;
+   background: linear-gradient(to right, #fe504f, #f96865);
+}
+
+.content {
+  z-index: 2;
+  position: relative;
+  text-shadow: 0 0 2px #141527;
 }
