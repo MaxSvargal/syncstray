@@ -12,6 +12,7 @@
     "comma-dangle": 0,
     "no-use-before-define": 0,
     "import/no-unresolved": [2, { ignore: ['electron'] }],
+    "react/sort-comp": 0,
     "react/jsx-no-bind": 0,
     "react/jsx-curly-spacing": [2, "always"],
     "react/prefer-stateless-function": 0,

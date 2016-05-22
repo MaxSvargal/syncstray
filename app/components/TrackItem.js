@@ -1,11 +1,15 @@
-import React, { Component, PropTypes } from 'react'
+import React, { Component } from 'react'
 import radium from 'radium'
 
 @radium
 export default class TrackItem extends Component {
-  static propTypes = {
-    model: PropTypes.object.isRequired,
-    worker: PropTypes.object
+  props: {
+    model: {
+      artist: string,
+      title: string
+    },
+    worker: Object,
+    onDownloadEnd: Function
   };
 
   state = {
@@ -15,6 +19,11 @@ export default class TrackItem extends Component {
   componentWillReceiveProps({ worker }) {
     worker && worker.on('message', ({ progress }) =>
       this.setState({ progress }))
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    prevState.progress === '0.99' &&
+      this.props.onDownloadEnd()
   }
 
   render() {
@@ -37,7 +46,7 @@ export default class TrackItem extends Component {
             progressPerc === 100 && styles.contentComplete] }>
           { artist } - { title }
         </span>
-        <span>{ progressPerc }%</span>
+        <span style={ styles.perc }>{ progressPerc }%</span>
       </div>
     )
   }
@@ -47,10 +56,12 @@ export default class TrackItem extends Component {
       container: {
         position: 'relative',
         padding: '.8rem 1rem',
-        borderBottom: '1px solid #333645'
+        borderBottom: '1px solid #333645',
+        marginBottom: 1,
+        lineHeight: '1rem'
       },
       bar: {
-        height: '3rem',
+        height: '2.6rem',
         zIndex: 1,
         top: 0,
         left: 0,
@@ -73,6 +84,14 @@ export default class TrackItem extends Component {
       },
       contentComplete: {
         color: '#a6a7ac'
+      },
+      perc: {
+        position: 'relative',
+        zIndex: 3,
+        float: 'right',
+        color: '#fff',
+        textShadow: '0 0 2px #141527',
+        fontSize: '.8em'
       }
     }
   }

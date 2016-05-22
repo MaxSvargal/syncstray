@@ -1,9 +1,9 @@
-import React, { Component, PropTypes } from 'react'
+import React, { Component } from 'react'
 
 export default class Progress extends Component {
-  static propTypes = {
-    value: PropTypes.number.isRequired
-  };
+  props: {
+    value: number
+  }
 
   render() {
     const val = (this.props.value * 100).toFixed(0)

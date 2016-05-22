@@ -1,6 +1,10 @@
 {
   "presets": ["es2015", "stage-0", "react"],
-  "plugins": ["transform-decorators-legacy", "add-module-exports"],
+  "plugins": [
+    "add-module-exports",
+    "transform-decorators-legacy",
+    ["typecheck", { "disable": { "production": true } }]
+  ],
   "env": {
     "development": {
       "presets": ["react-hmre"]
@@ -9,6 +13,11 @@
       "plugins": [
         ["webpack-loaders", { "config": "webpack.config.node.js", "verbose": false }]
       ]
-    }
+    },
+    "production": [
+      "transform-decorators-legacy",
+      "add-module-exports",
+      "react-remove-prop-types"
+    ]
   }
 }

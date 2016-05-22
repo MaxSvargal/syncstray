@@ -1,18 +1,18 @@
-import React, { Component, PropTypes } from 'react'
+import React, { Component } from 'react'
 import { Link } from 'react-router'
 const { app, dialog } = require('electron').remote
 
 import TracksList from './TracksList'
 
 export default class Audio extends Component {
-  static propTypes = {
-    audio: PropTypes.array.isRequired,
-    workers: PropTypes.object.isRequired,
-    getAudio: PropTypes.func.isRequired,
-    startDownload: PropTypes.func.isRequired,
-    pauseDownload: PropTypes.func.isRequired,
-    setDlPath: PropTypes.func.isRequired
-  };
+  props: {
+    audio: [],
+    workers: {},
+    getAudio: () => void,
+    startDownload: () => void,
+    pauseDownload: () => void,
+    setDlPath: () => void,
+  }
 
   componentWillMount() {
     this.props.getAudio()
@@ -31,17 +31,17 @@ export default class Audio extends Component {
     selectFolder()
   }
 
-  download = () => this.props.startDownload()
-  pause = () => this.props.pauseDownload()
-
   render() {
-    const { workers, audio } = this.props
+    const { workers, audio, scrolled } = this.props
+    const { startDownload, pauseDownload, triggerScroll } = this.props
     return (
       <div>
         <Link to="/">Go home</Link>
-        <button onClick={ this.download }>Download</button>
-        <button onClick={ this.pause }>Pause</button>
-        <TracksList collection={ audio } workers={ workers } />
+        <button onClick={ startDownload }>Download</button>
+        <button onClick={ pauseDownload }>Pause</button>
+        <TracksList
+          collection={ audio }
+          workers={ workers } />
       </div>
     )
   }
