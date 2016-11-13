@@ -1,11 +1,15 @@
 {
   "presets": ["es2015", "stage-0", "react"],
-  "plugins": [
-    "add-module-exports",
-    "transform-decorators-legacy",
-    ["typecheck", { "disable": { "production": true } }]
-  ],
+  "plugins": ["add-module-exports", "babel-plugin-transform-decorators-legacy"],
   "env": {
+  	"production": {
+  		"presets": ["react-optimize"],
+  		"plugins": [
+  			"babel-plugin-transform-remove-console",
+  			"babel-plugin-transform-remove-debugger",
+  			"babel-plugin-dev-expression"
+  		]
+  	},
     "development": {
       "presets": ["react-hmre"]
     },
@@ -13,11 +17,6 @@
       "plugins": [
         ["webpack-loaders", { "config": "webpack.config.node.js", "verbose": false }]
       ]
-    },
-    "production": [
-      "transform-decorators-legacy",
-      "add-module-exports",
-      "react-remove-prop-types"
-    ]
+    }
   }
 }

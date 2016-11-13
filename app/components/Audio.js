@@ -8,10 +8,13 @@ export default class Audio extends Component {
   props: {
     audio: [],
     workers: {},
+    progresStates: {},
+    dlState: bool,
     getAudio: () => void,
     startDownload: () => void,
     pauseDownload: () => void,
     setDlPath: () => void,
+    saveProgressState: () => void
   }
 
   componentWillMount() {
@@ -32,7 +35,7 @@ export default class Audio extends Component {
   }
 
   render() {
-    const { workers, audio } = this.props
+    const { workers, audio, dlState, progresStates, saveProgressState } = this.props
     const { startDownload, pauseDownload } = this.props
     return (
       <div>
@@ -41,7 +44,10 @@ export default class Audio extends Component {
         <button onClick={ pauseDownload }>Pause</button>
         <TracksList
           collection={ audio }
-          workers={ workers } />
+          workers={ workers }
+          dlState={ dlState }
+          progresStates={ progresStates }
+          saveProgressState={ saveProgressState } />
       </div>
     )
   }

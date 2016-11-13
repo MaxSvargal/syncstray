@@ -1,29 +1,56 @@
 import React, { Component } from 'react'
 import radium from 'radium'
+import { bindActionCreators } from 'redux'
+import { connect } from 'react-redux'
+import { saveState } from '../actions/trackState'
 
+@connect((state, ownProps) => ({
+  worker: state.workers[ownProps.model.aid],
+  state: state.progresStates[ownProps.model.aid]
+}), dispatch => bindActionCreators({ saveState }, dispatch))
 @radium
 export default class TrackItem extends Component {
   props: {
+    worker: {},
+    state: {},
     model: {
+      aid: number,
       artist: string,
       title: string
     },
-    worker: Object,
-    onDownloadEnd: Function
-  };
+    onDownloadEnd: Function,
+    saveState: Function
+  }
 
-  state = {
+  state = this.props.state || {
     progress: 0
   }
 
-  componentWillReceiveProps({ worker }) {
-    worker && worker.on('message', ({ progress }) =>
-      this.setState({ progress }))
+  mounted = false
+
+  componentWillMount() {
+    this.mounted = true
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    prevState.progress === '0.99' &&
-      this.props.onDownloadEnd()
+  componentWillUnmount() {
+    this.mounted = false
+    this.props.saveState(this.props.model.aid, this.state)
+  }
+
+  progressStateHandler = ({ progress }) => {
+    this.mounted &&
+      this.setState({ progress: parseFloat(progress) })
+  }
+
+  componentWillReceiveProps({ worker, state }) {
+    (worker && !this.props.worker) &&
+      worker.on('message', this.progressStateHandler)
+    state && this.setState(state)
+  }
+
+  componentDidUpdate() {
+    this.state.progress === 1 &&
+      this.props.onDownloadEnd(this.props.model.aid)
   }
 
   render() {
@@ -38,6 +65,7 @@ export default class TrackItem extends Component {
           style={ [
             styles.bar,
             progressPerc > 0 && styles.barProgress,
+            progressPerc >= 99 && styles.barComplete,
             { width: `${progressPerc}%` }] } />
         <span
           style={ [
@@ -56,22 +84,30 @@ export default class TrackItem extends Component {
       container: {
         position: 'relative',
         padding: '.8rem 1rem',
+        height: 42,
+        boxSizing: 'border-box',
         borderBottom: '1px solid #333645',
         marginBottom: 1,
         lineHeight: '1rem'
       },
       bar: {
-        height: '2.6rem',
+        height: 42,
         zIndex: 1,
         top: 0,
         left: 0,
         transition: 'width .6s',
         position: 'absolute',
         background: '#323b48',
-        outline: '1px solid #1f252c'
+        borderBottom: '1px solid #1f252c'
       },
       barProgress: {
         background: 'linear-gradient(to right, #fd3d3c, #ff7a77)',
+        boxShadow: '0 -2px 0 #ff605d'
+      },
+      barComplete: {
+        background: '#323b48',
+        borderBottom: '1px solid #3c444e',
+        boxShadow: 'none'
       },
       content: {
         zIndex: 2,

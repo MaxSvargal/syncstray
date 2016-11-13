@@ -25,6 +25,7 @@ export default class Auth extends Component {
     return (
       <div>
         <div className={ styles.container }>
+          <h1>Authorization....</h1>
           <webview
             className={ styles.vkview }
             src="https://oauth.vk.com/authorize?client_id=4138123&scope=audio&response_type=code"
