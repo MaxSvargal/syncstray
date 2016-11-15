@@ -1,6 +1,7 @@
 import { accessSync, F_OK } from 'fs'
 import path from 'path'
 import childProcess from 'child_process'
+import { remote } from 'electron'
 
 import { eventChannel, END } from 'redux-saga'
 import { take, fork, put, select, call } from 'redux-saga/effects'
@@ -9,7 +10,9 @@ import { downloadNext, setDlProgress, setDlWorker, removeDlWorker } from 'action
 import { getCurrentDlIndex, getTrackByIndex, dlIsPaused, getDlWorkers, getDlThreads, getDlDir } from 'sagas/selectors'
 import { SET_VK_TRACKS, DOWNLOAD_NEXT, TOGGLE_PAUSE_DOWNLOAD, SELECT_DOWNLOAD_DIR } from 'actions/types'
 
-const workerPath = './app/services/downloadWorker.js'
+const workerPath = process.env === 'production' ?
+  path.join(remote.app.getAppPath(), 'services/downloadWorker.js') :
+  './app/services/downloadWorker.js'
 
 /* Helpers */
 

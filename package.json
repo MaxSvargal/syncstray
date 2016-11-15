@@ -42,6 +42,7 @@
       ]
     },
     "files": [
+      "services/downloadWorker.js",
       "dist/",
       "node_modules/",
       "app.html",
