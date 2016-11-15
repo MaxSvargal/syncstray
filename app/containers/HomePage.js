@@ -1,11 +1,19 @@
-// @flow
-import React, { Component } from 'react';
-import Home from '../components/Home';
+import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import Home from 'components/home'
+import Audio from 'components/audio'
 
-export default class HomePage extends Component {
+@connect(({ vk: { token } }) => ({ token }))
+class HomePage extends Component {
+  props: {
+    token: string
+  }
+
   render() {
     return (
-      <Home />
-    );
+      this.props.token ? <Audio /> : <Home />
+    )
   }
 }
+
+export default HomePage

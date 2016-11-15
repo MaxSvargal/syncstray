@@ -1,9 +1,13 @@
 // @flow
-import { combineReducers } from 'redux';
-import { routerReducer as routing } from 'react-router-redux';
+import { combineReducers } from 'redux'
+import { routerReducer as routing } from 'react-router-redux'
+import vk from './vk'
+import downloader from './downloader'
 
 const rootReducer = combineReducers({
-  routing
-});
+  routing,
+  downloader,
+  vk
+})
 
-export default rootReducer;
+export default rootReducer
