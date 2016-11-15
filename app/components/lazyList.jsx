@@ -12,7 +12,7 @@ class LazyList extends Component {
 
   state = {
     showNum: Math.round(this.props.windowHeight / this.props.elementHeight) * 2,
-    shownChildren: this.props.children.slice(0, 50),
+    shownChildren: this.props.children,
     scrolledNum: 0,
     topOffset: 0,
     bottomOffset: 0
