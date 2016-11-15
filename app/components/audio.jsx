@@ -26,10 +26,6 @@ export default class Audio extends Component {
     }
   }
 
-  shouldComponentUpdate(props) {
-    return props.tracks.length !== this.props.tracks.length
-  }
-
   render() {
     const { togglePauseDownload } = this.props
     const styles = this.getStyles()

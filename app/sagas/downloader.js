@@ -4,9 +4,10 @@ import childProcess from 'child_process'
 
 import { eventChannel, END } from 'redux-saga'
 import { take, fork, put, select, call } from 'redux-saga/effects'
+import { replace } from 'react-router-redux'
 import { downloadNext, setDlProgress, setDlWorker, removeDlWorker } from 'actions'
-import { getCurrentDlIndex, getTrackByIndex, dlIsPaused, getDlWorkers, getDlThreads } from 'sagas/selectors'
-import { SET_VK_TRACKS, DOWNLOAD_NEXT, TOGGLE_PAUSE_DOWNLOAD } from 'actions/types'
+import { getCurrentDlIndex, getTrackByIndex, dlIsPaused, getDlWorkers, getDlThreads, getDlDir } from 'sagas/selectors'
+import { SET_VK_TRACKS, DOWNLOAD_NEXT, TOGGLE_PAUSE_DOWNLOAD, SELECT_DOWNLOAD_DIR } from 'actions/types'
 
 const workerPath = './app/services/downloadWorker.js'
 
@@ -39,17 +40,17 @@ export function* watchWorkerEndProgress(aid, worker) {
     while (true) yield take(chan)
   } finally {
     yield put(removeDlWorker(aid))
-    yield put(setDlProgress(aid, 100))
+    yield put(setDlProgress(aid, 1))
     yield put(downloadNext())
   }
 }
 
 export function* downloadTrack({ aid, artist, title, url }) {
-  const dlPath = path.resolve(process.cwd(), 'cache')
+  const dlPath = yield select(getDlDir)
   const dest = getDestPath(dlPath, artist, title)
   try {
     accessSync(dest, F_OK)
-    yield put(setDlProgress(aid, 100))
+    yield put(setDlProgress(aid, 1))
     yield put(downloadNext())
   } catch (err) {
     const worker = childProcess.fork(workerPath, [ url, dest ])
@@ -63,6 +64,11 @@ export function* downloadTrack({ aid, artist, title, url }) {
 export function* initialDownloadTracks() {
   while (yield take(SET_VK_TRACKS)) {
     const threads = yield select(getDlThreads)
+    const dlDir = yield select(getDlDir)
+    if (!dlDir) {
+      yield take(SELECT_DOWNLOAD_DIR)
+      yield put(replace('/audio'))
+    }
 
     for (let i = 0; i < threads; i += 1) {
       yield put(downloadNext())

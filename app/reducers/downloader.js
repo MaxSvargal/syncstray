@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux'
 import {
-  DOWNLOAD_NEXT, SET_DOWNLOAD_PROGRESS, SET_DL_WORKER,
-  REMOVE_DL_WORKER, TOGGLE_PAUSE_DOWNLOAD, SET_DOWNLOAD_THREADS
+  DOWNLOAD_NEXT, SET_DOWNLOAD_PROGRESS, SET_DL_WORKER, REMOVE_DL_WORKER,
+  SELECT_DOWNLOAD_DIR, TOGGLE_PAUSE_DOWNLOAD, SET_DOWNLOAD_THREADS
 } from 'actions/types'
 
 export const threads = (state = 4, { type, value }) =>
@@ -12,6 +12,9 @@ export const paused = (state = false, { type }) =>
 
 export const dlIndex = (state = -1, { type }) =>
   type === DOWNLOAD_NEXT ? state + 1 : state
+
+export const dlDir = (state = null, { type, directory }) =>
+  type === SELECT_DOWNLOAD_DIR ? directory : state
 
 export const progresses = (state = {}, { type, aid, progress }) =>
   type === SET_DOWNLOAD_PROGRESS ? { ...state, [aid]: progress } : state
@@ -24,4 +27,4 @@ export const workers = (state = {}, { type, aid, worker }) => {
   }
 }
 
-export default combineReducers({ dlIndex, paused, workers, progresses, threads })
+export default combineReducers({ dlIndex, dlDir, paused, workers, progresses, threads })

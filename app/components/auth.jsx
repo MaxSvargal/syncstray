@@ -31,8 +31,7 @@ export default class Auth extends Component {
         <webview
           src={ `https://oauth.vk.com/authorize?client_id=${this.clientId}&scope=audio&response_type=code` }
           ref={ c => (this.webview = c) }
-          style={ styles.webView }
-        />
+          style={ styles.webView } />
       </div>
     )
   }

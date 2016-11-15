@@ -70,7 +70,8 @@ class TrackItem extends Component {
         height: '3rem',
         lineHeight: '3rem',
         zIndex: 10,
-        overflow: 'hidden'
+        overflow: 'hidden',
+        boxSizing: 'border-box'
       }
     }
   }

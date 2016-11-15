@@ -12,7 +12,7 @@ class LazyList extends Component {
 
   state = {
     showNum: Math.round(this.props.windowHeight / this.props.elementHeight) * 2,
-    shownChildren: this.props.children.slice(0, 10),
+    shownChildren: this.props.children.slice(0, 50),
     scrolledNum: 0,
     topOffset: 0,
     bottomOffset: 0
@@ -62,12 +62,13 @@ class LazyList extends Component {
   }
 
   render() {
+    const { windowHeight } = this.props
     const { shownChildren, topOffset, bottomOffset } = this.state
     const styles = this.getStyles()
     return (
-      <div style={ styles.root } >
+      <div>
         <div style={ styles.topOffset(topOffset) } />
-        <div style={ styles.container }>{ shownChildren }</div>
+        <div style={ styles.container(windowHeight) }>{ shownChildren }</div>
         <div style={ styles.bottomOffset(bottomOffset) } />
       </div>
     )
@@ -75,13 +76,12 @@ class LazyList extends Component {
 
   getStyles() {
     return {
-      container: {
+      container: windowHeight => ({
         display: 'flex',
         flexFlow: 'column nowrap',
         position: 'relative',
-        width: '100vw',
-        height: '100vh'
-      },
+        height: windowHeight
+      }),
       topOffset: value => ({
         marginTop: value
       }),

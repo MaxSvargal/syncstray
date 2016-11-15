@@ -10,6 +10,7 @@ export default class Home extends Component {
     return (
       <div style={ styles.root }>
         <h1>Welcome!</h1>
+        <p>At first login to vk.com</p>
         <div>
           <Link to='/auth' style={ styles.link }>Log in</Link>
         </div>

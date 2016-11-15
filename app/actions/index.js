@@ -31,3 +31,6 @@ export const removeDlWorker = aid =>
 
 export const togglePauseDownload = () =>
   action(actions.TOGGLE_PAUSE_DOWNLOAD)
+
+export const selectDlDir = directory =>
+  action(actions.SELECT_DOWNLOAD_DIR, { directory })

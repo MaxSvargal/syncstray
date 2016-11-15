@@ -11,7 +11,7 @@ export function* vkAuthSaga() {
       const { accessToken, expiresIn, userId } = yield call(fetchVkToken, code)
       yield put(setVkToken(accessToken, expiresIn))
       yield put(setVkUserId(userId))
-      yield put(replace('/audio'))
+      yield put(replace('/selectDir'))
     } catch (err) {
       console.error(err)
     }
