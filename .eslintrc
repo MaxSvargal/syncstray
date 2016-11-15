@@ -7,21 +7,49 @@
     "node": true
   },
   "rules": {
+    "array-bracket-spacing": [2, "always"],
     "arrow-parens": ["off"],
-    "consistent-return": "off",
     "comma-dangle": "off",
+    "consistent-return": "off",
+    "class-methods-use-this": [2, {
+      "exceptMethods": [
+        "render",
+        "componentWillMount",
+        "componentDidMount",
+        "shouldComponentUpdate",
+        "componentWillUpdate",
+        "getStyles"
+    ]}],
+    "flowtype-errors/show-errors": 2,
     "generator-star-spacing": "off",
-    "import/no-unresolved": ["error", { "ignore": ["electron"] }],
     "import/no-extraneous-dependencies": "off",
+    "import/no-unresolved": ["error", { "ignore": ["electron"] }],
+    "jsx-quotes": [2, "prefer-single"],
+    "no-confusing-arrow": 0,
+    "no-unused-expressions": 0,
+    "react/jsx-curly-spacing": [2, "always"],
     "no-use-before-define": "off",
-    "promise/param-names": 2,
+    "no-constant-condition": ["error", { "checkLoops": false }],
     "promise/always-return": 2,
     "promise/catch-or-return": 2,
     "promise/no-native": 0,
-    "react/jsx-no-bind": "off",
+    "promise/param-names": 2,
+    "react/jsx-closing-bracket-location": [2, "after-props" ],
     "react/jsx-filename-extension": ["error", { "extensions": [".js", ".jsx"] }],
+    "react/jsx-no-bind": "off",
     "react/prefer-stateless-function": "off",
-    "flowtype-errors/show-errors": 2
+    "react/no-unused-prop-types": 0, # bug https://github.com/yannickcr/eslint-plugin-react/issues/847
+    "react/sort-comp": [1, {
+      order: [
+        "type-annotations",
+        "static-methods",
+        "everything-else",
+        "lifecycle",
+        "render",
+        "getStyles"
+      ],
+    }],
+    "semi": [1, "never"]
   },
   "plugins": [
     "flowtype-errors",
@@ -31,6 +59,9 @@
   ],
   "settings": {
     "import/resolver": {
+      "node": {
+        "moduleDirectory": [ "node_modules", "app" ]
+      },
       "webpack": {
         "config": "webpack.config.eslint.js"
       }
