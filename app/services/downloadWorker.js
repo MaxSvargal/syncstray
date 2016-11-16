@@ -6,7 +6,7 @@ const https = require('https')
 const file = fs.createWriteStream(dist)
 const httpsUrl = url.replace(/^http:\/\//i, 'https://')
 
-https.get(url, resp => {
+https.get(httpsUrl, resp => {
   resp.pipe(file)
 
   const len = parseInt(resp.headers['content-length'], 10)
