@@ -4,6 +4,7 @@ const fs = require('fs')
 const https = require('https')
 
 const file = fs.createWriteStream(dist)
+const httpsUrl = url.replace(/^http:\/\//i, 'https://')
 
 https.get(url, resp => {
   resp.pipe(file)
