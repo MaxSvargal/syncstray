@@ -6,6 +6,26 @@ const https = require('https')
 const file = fs.createWriteStream(dist)
 const httpsUrl = url.replace(/^http:\/\//i, 'https://')
 
+function errorHandle({ message }) {
+  fs.unlinkSync(dist)
+  process.send({ error: message })
+  process.exit(1)
+}
+
+const timeoutTimer = {
+  timer: null,
+  update() {
+    this.clear()
+    this.timer = setTimeout(() =>
+      errorHandle({ message: 'timeout' }), 3000)
+  },
+  clear() {
+    clearTimeout(this.timer)
+  }
+}
+
+timeoutTimer.update()
+
 https.get(httpsUrl, resp => {
   resp.pipe(file)
 
@@ -13,30 +33,30 @@ https.get(httpsUrl, resp => {
   let downloaded = 0
   let latestVal = 0
 
-  resp.on('data', ({ length }) => {
-    downloaded += length
+  resp.on('data', chunk => {
+    downloaded += chunk.length
     const currVal = (downloaded / len).toFixed(2)
     if (currVal !== latestVal) process.send({ progress: (downloaded / len).toFixed(2) })
     latestVal = currVal
+    timeoutTimer.update()
   })
 
   resp.on('end', () => {
     file.close()
+    timeoutTimer.clear()
     process.exit(0)
   })
+
+  resp.on('error', errorHandle)
 
   process.on('message', msg => {
     switch (msg) {
       case 'pause':
-        return resp.pause()
+        return timeoutTimer.clear() || resp.pause()
       case 'resume':
-        return resp.resume()
+        return timeoutTimer.update() || resp.resume()
       default:
         break
     }
   })
-}).on('error', error => {
-  fs.unlink(file)
-  process.send({ error })
-  process.exit(1)
-})
+}).on('error', errorHandle)

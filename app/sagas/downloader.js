@@ -24,7 +24,8 @@ const getDestPath = (dlPath, artist, title) =>
 
 export function workerProgressEndChannel(worker) {
   return eventChannel(emitter => {
-    function listener({ progress }) {
+    function listener({ progress, error }) {
+      if (error) emitter({ error })
       if (parseInt(progress, 10) === 1) {
         worker.removeListener('message', listener)
         emitter(END)
@@ -40,7 +41,10 @@ export function workerProgressEndChannel(worker) {
 export function* watchWorkerEndProgress(aid, worker) {
   const chan = yield call(workerProgressEndChannel, worker)
   try {
-    while (true) yield take(chan)
+    while (true) {
+      const { error } = yield take(chan)
+      if (error) yield put({ type: 'ERROR', error, aid })
+    }
   } finally {
     yield put(removeDlWorker(aid))
     yield put(setDlProgress(aid, 1))
@@ -94,8 +98,7 @@ export function* workersPauseWatcher() {
     const workers = yield select(getDlWorkers)
     const isPaused = yield select(dlIsPaused)
     const task = isPaused ? 'pause' : 'resume'
-
-    workers.forEach(worker => worker && worker.send(task))
+    workers.forEach(worker => worker.connected && worker.send(task))
   }
 }
 
