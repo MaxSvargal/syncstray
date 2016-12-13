@@ -4,6 +4,7 @@
 
 import path from 'path'
 import validate from 'webpack-validator'
+import { dependencies as externals } from './app/package.json'
 
 export default validate({
   module: {
@@ -28,14 +29,10 @@ export default validate({
   // https://webpack.github.io/docs/configuration.html#resolve
   resolve: {
     extensions: [ '', '.js', '.jsx', '.json' ],
-    modulesDirectories: [ 'node_modules', 'app' ],
-    packageMains: [ 'webpack', 'browser', 'web', 'browserify', [ 'jam', 'main' ], 'main' ]
+    modulesDirectories: [ 'node_modules', 'app' ]
   },
 
   plugins: [],
 
-  externals: [
-    // put your node 3rd party libraries which can't be built with webpack here
-    // (mysql, mongodb, and so on..)
-  ]
+  externals: Object.keys(externals || {})
 })

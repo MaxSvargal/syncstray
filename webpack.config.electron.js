@@ -2,15 +2,15 @@
  * Build config for electron 'Main Process' file
  */
 
-import webpack from 'webpack';
-import validate from 'webpack-validator';
-import merge from 'webpack-merge';
-import baseConfig from './webpack.config.base';
+import webpack from 'webpack'
+import validate from 'webpack-validator'
+import merge from 'webpack-merge'
+import baseConfig from './webpack.config.base'
 
 export default validate(merge(baseConfig, {
   devtool: 'source-map',
 
-  entry: ['babel-polyfill', './app/main.development'],
+  entry: [ 'babel-polyfill', './app/main.development' ],
 
   // 'main.js' in root
   output: {
@@ -39,7 +39,7 @@ export default validate(merge(baseConfig, {
   ],
 
   /**
-   * Set targed to Electron speciffic node.js env.
+   * Set target to Electron specific node.js env.
    * https://github.com/chentsulin/webpack-target-electron-renderer#how-this-module-works
    */
   target: 'electron-main',
@@ -53,8 +53,4 @@ export default validate(merge(baseConfig, {
     __dirname: false,
     __filename: false
   },
-
-  externals: [
-    // 'source-map-support'
-  ]
-}));
+}))
